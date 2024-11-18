@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = ["registry"]
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+correctness = "warn"
+suspicious = "warn"
+style = "warn"
+pedantic = "warn"
+nursery = "warn"
+complexity = "warn"
+perf = "warn"
+enum_glob_use = { level = "warn", priority = 1 }
+single_match_else = { level = "allow", priority = 1 }
+match_bool = { level = "allow", priority = 1 }
+
+[workspace.dependencies]
