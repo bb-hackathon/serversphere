@@ -4,7 +4,23 @@ version = "0.1.0"
 edition = "2021"
 authors = ["mxxntype <59417007+mxxntype@users.noreply.github.com>"]
 
+[[bin]]
+name = "registry-server"
+path = "src/main.rs"
+
 [lints]
 workspace = true
 
 [dependencies]
+color-eyre = "0.6.3"
+eyre = "0.6.12"
+rusqlite = "=0.32.1"
+sqlx = { version = "=0.8.1", features = ["sqlite", "runtime-tokio"] }
+tracing = "0.1.40"
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
+
+[dependencies.tokio]
+version = "1.41.1"
+default-features = false
+features = ["rt", "macros"]
