@@ -2,7 +2,7 @@
     description = "Cloud compute resource & access manager";
 
     inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+        nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
         naersk.url = "github:nix-community/naersk";
         snowfall-lib = {
             url = "github:mxxntype/snowfall";
