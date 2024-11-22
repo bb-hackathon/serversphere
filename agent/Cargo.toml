@@ -1,8 +1,12 @@
 [package]
-name = "serversphere-registry"
+name = "serversphere-agent"
 version = "0.1.0"
 edition = "2021"
 authors = ["mxxntype <59417007+mxxntype@users.noreply.github.com>"]
+
+[[bin]]
+name = "serversphere-agent"
+path = "src/main.rs"
 
 [lints]
 workspace = true

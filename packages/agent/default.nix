@@ -8,7 +8,6 @@
 let
     toolchain = (pkgs.rustChannelOf {
         rustToolchain = ../../rust-toolchain.toml;
-        # NOTE: This needs to be replaced whenever the Rust toolchain is updated.
         sha256 = "yMuSb5eQPO/bHv+Bcf/US8LVMbf/G/0MSfiPwBhiPpk=";
     }).rust;
 
@@ -20,7 +19,7 @@ in
 
 naersk'.buildPackage rec {
     src = ../..;
-    pname = "serversphere";
+    pname = "serversphere-agent";
 
     # Rust projects that have something to do with networking are very likely
     # to fail to compile if OpenSSL and pkg-config are unavailable at comptime.

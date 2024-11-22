@@ -20,5 +20,6 @@
         inherit inputs;
         src = ./.;
         overlays = with inputs; [ (import nixpkgs-mozilla) ];
+        alias.packages.default = "agent";
     };
 }

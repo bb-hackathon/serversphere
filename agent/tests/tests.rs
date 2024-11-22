@@ -1,4 +1,4 @@
-use serversphere_registry::add;
+use serversphere_agent::add;
 
 #[test]
 fn sanity_check() {
