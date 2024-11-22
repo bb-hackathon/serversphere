@@ -19,3 +19,12 @@ tarpaulin-report.html
 
 .direnv
 registry.db
+#local db
+.sqlite
+#python cache
+__pycache__
+#virtual envs for python
+.venv
+venv
+#settings
+settings.toml
