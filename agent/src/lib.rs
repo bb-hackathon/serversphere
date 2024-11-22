@@ -19,6 +19,7 @@ pub const PORT: u16 = 8000;
 pub async fn run_agent() -> Result<(), crate::Error> {
     let router = Router::new()
         .route("/status", get(health_check))
+        .route("/metrics", get(commands::metrics))
         .route("/reboot", post(commands::reboot));
 
     let addr = (Ipv4Addr::UNSPECIFIED, PORT);

@@ -12,10 +12,12 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
-axum = "0.7.9"
+axum = { version = "0.7.9", features = ["macros"] }
 color-eyre = "0.6.3"
 eyre = "0.6.12"
 nix = { version = "0.29.0", features = ["reboot"] }
+serde = { version = "1.0.215", features = ["derive"] }
+sysinfo = "0.32.0"
 thiserror = "2.0.3"
 tokio = { version = "1.41.1", default-features = false, features = ["rt-multi-thread", "macros"] }
 tracing = "0.1.40"
