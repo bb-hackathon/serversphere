@@ -12,3 +12,11 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
+axum = "0.7.9"
+color-eyre = "0.6.3"
+eyre = "0.6.12"
+thiserror = "2.0.3"
+tokio = { version = "1.41.1", default-features = false, features = ["rt-multi-thread", "macros"] }
+tracing = "0.1.40"
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
