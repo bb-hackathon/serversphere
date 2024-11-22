@@ -1,6 +1,7 @@
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::missing_errors_doc)]
 
+mod commands;
 mod error;
 
 pub use error::*;
@@ -18,7 +19,7 @@ pub const PORT: u16 = 8000;
 pub async fn run_agent() -> Result<(), crate::Error> {
     let router = Router::new()
         .route("/status", get(health_check))
-        .route("/reboot", post(unimplemented));
+        .route("/reboot", post(commands::reboot));
 
     let addr = (Ipv4Addr::UNSPECIFIED, PORT);
     tracing::info!(message = "setting up listener", ?addr);
@@ -31,6 +32,7 @@ pub async fn run_agent() -> Result<(), crate::Error> {
 
 #[instrument]
 pub async fn health_check() -> impl IntoResponse {
+    tracing::debug!(message = "handling status request");
     (
         StatusCode::OK,
         format!("{} is online, node is alive", env!("CARGO_CRATE_NAME")),
