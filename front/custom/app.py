@@ -1,19 +1,40 @@
 from flask import Flask, request, jsonify, render_template
 import subprocess
 import atexit
+import psutil
 
 app = Flask(__name__)
 
 novnc_processes = {}
-base_port = 6080  
+base_port = 6080 
+
+@app.route('/')
+def index():
+    return render_template('reg.html')
 
 @app.route('/index')
 def list():
     return render_template('index.html')
 
-@app.route('/')
-def index():
-    return render_template('reg.html')
+@app.route('/charts')
+def charts():
+    vm_name = request.args.get('vm', 'Unknown VM')
+    return render_template('charts.html', vm_name=vm_name)
+
+
+@app.route('/api/metrics', methods=['GET'])
+def system_status():
+    cpu_load = psutil.cpu_percent(interval=1)
+
+    memory = psutil.virtual_memory()
+    memory_usage = memory.percent 
+
+    status = {
+        'cpu_load': cpu_load,
+        'memory_usage': memory_usage,
+    }
+
+    return jsonify(status)
 
 @app.route('/api/connect', methods=['POST'])
 def connect_vm():

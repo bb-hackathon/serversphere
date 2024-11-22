@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>График состояния системы</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+        }
+        .header p {
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .controls label {
+            font-size: 1.2em;
+            color: #34495e;
+        }
+        .controls select {
+            padding: 10px;
+            font-size: 1em;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .chart-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 400px !important;
+        }
+        .charts-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        footer {
+            text-align: center;
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>График состояния системы для {{ vm_name }}</h1>
+            <p>Мониторинг загрузки процессора и использования памяти в реальном времени для выбранного хоста.</p>
+        </div>
+
+        <div class="controls">
+            <label for="cpuChartType">Выберите тип графика для CPU:</label>
+            <select id="cpuChartType">
+                <option value="line">Линейный</option>
+                <option value="bar">Столбчатый</option>
+                <option value="radar">Радарный</option>
+                <option value="pie">Круговой</option>
+            </select>
+        </div>
+
+        <div class="controls">
+            <label for="memoryChartType">Выберите тип графика для памяти:</label>
+            <select id="memoryChartType">
+                <option value="line">Линейный</option>
+                <option value="bar">Столбчатый</option>
+                <option value="radar">Радарный</option>
+                <option value="pie">Круговой</option>
+            </select>
+        </div>
+
+        <div class="chart-container">
+            <div class="charts-title">Загрузка процессора (%)</div>
+            <canvas id="cpuChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="charts-title">Использование памяти (%)</div>
+            <canvas id="memoryChart"></canvas>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Мониторинг системы. Все права защищены.</p>
+    </footer>
+
+    <script>
+        const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+
+        const cpuData = {
+            labels: [],
+            datasets: [{
+                label: 'Загрузка процессора (%)',
+                data: [],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+        const memoryData = {
+            labels: [],
+            datasets: [{
+                label: 'Использование памяти (%)',
+                data: [],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        const cpuConfig = {
+            type: 'line',
+            data: cpuData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Точки времени' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: 'Процент нагрузки' }
+                    }
+                }
+            }
+        };
+
+        const memoryConfig = {
+            type: 'line',
+            data: memoryData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Точки времени' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: 'Процент использования' }
+                    }
+                }
+            }
+        };
+
+        const cpuChart = new Chart(cpuCtx, cpuConfig);
+        const memoryChart = new Chart(memoryCtx, memoryConfig);
+
+        function updateCpuChartType() {
+            const selectedType = document.getElementById('cpuChartType').value;
+            cpuChart.config.type = selectedType;
+            cpuChart.update();
+        }
+
+        function updateMemoryChartType() {
+            const selectedType = document.getElementById('memoryChartType').value;
+            memoryChart.config.type = selectedType;
+            memoryChart.update();
+        }
+
+        document.getElementById('cpuChartType').addEventListener('change', updateCpuChartType);
+        document.getElementById('memoryChartType').addEventListener('change', updateMemoryChartType);
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/metrics');
+                const dataFromServer = await response.json();
+
+                const currentTime = cpuData.labels.length + 1;
+
+                cpuData.labels.push(currentTime);
+                cpuData.datasets[0].data.push(dataFromServer.cpu_load);
+                
+                memoryData.labels.push(currentTime);
+                memoryData.datasets[0].data.push(dataFromServer.memory_usage);
+
+                if (cpuData.labels.length > 50) {
+                    cpuData.labels.shift();
+                    cpuData.datasets[0].data.shift();
+                }
+
+                if (memoryData.labels.length > 50) {
+                    memoryData.labels.shift();
+                    memoryData.datasets[0].data.shift();
+                }
+
+                cpuChart.update();
+                memoryChart.update();
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        }
+
+
+        setInterval(fetchData, 1000);
+    </script>
+</body>
+</html>    

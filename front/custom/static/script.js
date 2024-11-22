@@ -14,6 +14,10 @@ const closeModalBtn = document.getElementById("close-modal");
 let isDragging = false;
 let offsetX = 0, offsetY = 0;
 
+function openChartsPage(vmName) {
+    window.location.href = `/charts?vm=${encodeURIComponent(vmName)}`;
+}
+
 function renderVMList() {
     vmTableBody.innerHTML = ""; 
     vmList.forEach((vm, index) => {
@@ -37,9 +41,11 @@ function renderVMList() {
                         ? `<button onclick="disconnectVM(${index})" class="btn btn-warning">Отключить</button>`
                         : ''
                 }
+                <button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
                 <button onclick="deleteVM(${index})" class="btn btn-danger">Удалить</button>
             </td>
         `;
+
         vmTableBody.appendChild(row);
     });
 }
