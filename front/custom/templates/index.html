@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подключитель Виртуальной Машинки</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <div class="container text-center">
+        <h1 class="animate__animated animate__fadeInDown">Толстый указатель</h1>
+
+        <div id="vm-list">
+            <h2 class="mt-4">Доступные устройства</h2>
+            <table class="table table-hover table-bordered mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Имя</th>
+                        <th>IP</th>
+                        <th>Порт</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="vm-table-body">
+                </tbody>
+            </table>
+        </div>
+
+        <button id="add-btn" class="btn btn-primary btn-lg mt-3">Добавить</button>
+
+        <div id="add-form" class="mt-4 animate__animated animate__fadeIn" style="display: none;">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title">Добавление</h3>
+                    <div class="mb-3">
+                        <label for="vm-name" class="form-label">Имя VM</label>
+                        <input type="text" class="form-control" id="vm-name" name="vm-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vm-ip" class="form-label">IP VM</label>
+                        <input type="text" class="form-control" id="vm-ip" name="vm-ip" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vm-port" class="form-label">Порт VM</label>
+                        <input type="text" class="form-control" id="vm-port" name="vm-port" required>
+                    </div>
+                    <button type="button" id="save-btn" class="btn btn-success">Сохранить</button>
+                    <button type="button" id="cancel-btn" class="btn btn-danger">Отменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" style="display: none; position: fixed; top: 10%; left: 10%; width: 80%; height: 80%; background-color: white; border: 1px solid #ddd; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); resize: both; overflow: hidden;">
+        <div id="modal-header" style="background-color: #f1f1f1; padding: 10px; display: flex; justify-content: space-between; align-items: center; cursor: move;">
+            <span>Подключение к VNC</span>
+            <button id="close-modal" style="padding: 5px 10px; background-color: red; color: white; border: none; cursor: pointer;">Закрыть</button>
+        </div>
+        <iframe id="vnc-frame" src="" style="width: 100%; height: calc(100% - 40px); border: none;"></iframe>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
