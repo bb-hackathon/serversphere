@@ -7,9 +7,13 @@ app = Flask(__name__)
 novnc_processes = {}
 base_port = 6080  
 
+@app.route('/index')
+def list():
+    return render_template('index.html')
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('reg.html')
 
 @app.route('/api/connect', methods=['POST'])
 def connect_vm():

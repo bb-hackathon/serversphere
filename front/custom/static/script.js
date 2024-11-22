@@ -1,7 +1,6 @@
-const vmList = []; // Локальный массив для хранения данных о виртуальных машинах
-const connectionStatus = {}; // Объект для хранения статуса подключения
+const vmList = []; 
+const connectionStatus = {};
 
-// Элементы интерфейса
 const vmTableBody = document.getElementById("vm-table-body");
 const addForm = document.getElementById("add-form");
 const addBtn = document.getElementById("add-btn");
@@ -27,18 +26,18 @@ function renderVMList() {
             <td>${vm.port}</td>
             <td>
                 <span class="badge ${isConnected ? 'bg-success' : 'bg-secondary'}">
-                    ${isConnected ? 'Connected' : 'Disconnected'}
+                    ${isConnected ? 'Онлайн' : 'Офлайн'}
                 </span>
             </td>
             <td>
-                <button onclick="connectVM(${index}, false)" class="btn btn-primary">Open Here</button>
-                <button onclick="connectVM(${index}, true)" class="btn btn-secondary">Open in New Tab</button>
+                <button onclick="connectVM(${index}, false)" class="btn btn-primary">Открыть в окне</button>
+                <button onclick="connectVM(${index}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
                 ${
                     isConnected
-                        ? `<button onclick="disconnectVM(${index})" class="btn btn-warning">Disconnect</button>`
+                        ? `<button onclick="disconnectVM(${index})" class="btn btn-warning">Отключить</button>`
                         : ''
                 }
-                <button onclick="deleteVM(${index})" class="btn btn-danger">Delete</button>
+                <button onclick="deleteVM(${index})" class="btn btn-danger">Удалить</button>
             </td>
         `;
         vmTableBody.appendChild(row);
@@ -47,7 +46,7 @@ function renderVMList() {
 
 function addVM(name, ip, port) {
     if (vmList.some(vm => vm.name === name)) {
-        alert("A virtual machine with this name already exists. Please use a unique name.");
+        alert("Имя уже занято. Используйте другое");
         return;
     }
 
@@ -65,6 +64,18 @@ function deleteVM(index) {
 
 function connectVM(index, newTab) {
     const vm = vmList[index];
+
+    if (connectionStatus[vm.name]) {
+        const existingUrl = `http://localhost:${connectionStatus[vm.name].port}/vnc.html?host=localhost&port=${connectionStatus[vm.name].port}`;
+        if (newTab) {
+            window.open(existingUrl, "_blank");
+        } else {
+            vncFrame.src = existingUrl;
+            modal.style.display = "block";
+        }
+        return;
+    }
+
     fetch("/api/connect", {
         method: "POST",
         headers: {
@@ -75,21 +86,26 @@ function connectVM(index, newTab) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            const port = new URL(data.url).port;
+            connectionStatus[vm.name] = {
+                connected: true,
+                port: parseInt(port, 10)
+            };
+
             if (newTab) {
-                window.open(data.url, "_blank"); 
+                window.open(data.url, "_blank");
             } else {
-                vncFrame.src = data.url; 
-                modal.style.display = "block"; 
+                vncFrame.src = data.url;
+                modal.style.display = "block";
             }
-            connectionStatus[vm.name] = true;
-            renderVMList(); 
+            renderVMList();
         } else {
             alert("Error: " + data.message);
         }
     })
     .catch(err => {
         console.error("Error:", err);
-        alert("Failed to connect. Check console for details.");
+        alert("Не удалось подключиться. Проверьте настройки.");
     });
 }
 
@@ -179,7 +195,7 @@ saveBtn.addEventListener("click", () => {
     }
 
     if (!ipPattern.test(vmIp)) {
-        alert("Invalid IP address format. Please enter a valid IP.");
+        alert("Неверный формат IP адресса");
         return;
     }
 
