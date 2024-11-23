@@ -4,4 +4,13 @@ class UserAlreadyExists(Exception):
 
     @property
     def message(self):
-        print(f"{self.name} already exists")
+        return f"{self.name} already exists"
+    
+
+class NotAdmin(Exception):
+    def __init__(self):
+        pass
+
+    @property
+    def message(self):
+        return f"Unauthorized access"

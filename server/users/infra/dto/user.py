@@ -4,13 +4,15 @@ import bcrypt
 
 class BaseUser(BaseModel):
      login: str
-     isAdmin: bool
+     sshKey: str
+     
 
 class UserReadDTO(BaseUser, BaseEntity):
-    pass
+    isAdmin: bool
 
 class UserAuthDTO(BaseUser):
     password: str
+    
 
 
 def hash_password(password: str):

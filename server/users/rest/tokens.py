@@ -3,7 +3,6 @@ import jwt
 
 def tokenize(_id: int):
     cookie = jwt.encode({"id": str(_id)}, "secret_key",algorithm="HS256")
-    print(cookie)
     return cookie
 
 def detokenize(cookie: str) -> int:

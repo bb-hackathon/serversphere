@@ -35,7 +35,7 @@ def user_status(request: Request, cur = Depends(get_cursor)):
 
 
 @user_router.post("/register")
-def register(request: Request, user: UserAuthDTO, cur = Depends(get_cursor)):
+def register(user: UserAuthDTO, cur = Depends(get_cursor)):
     user_repo = UserRepo(cur)
     try:
         user_repo.register_new_user(user)

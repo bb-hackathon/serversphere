@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     login TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    isAdmin INTEGER
+    isAdmin INTEGER NOT NULL,
+    sshKey TEXT NOT NULL
+    
 )
 """
 

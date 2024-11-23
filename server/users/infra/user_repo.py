@@ -13,10 +13,11 @@ class UserRepo:
     def register_new_user(self, user: UserAuthDTO):
         try:
             user.password = hash_password(user.password)
-            self.__cursor.execute(CREATE_NEW_USER, (user.login, user.password, user.isAdmin))
+            self.__cursor.execute(CREATE_NEW_USER, (user.login, user.password, user.sshKey))
             self.__cursor.connection.commit()
-        except IntegrityError:
-            raise UserAlreadyExists(user.login)
+        except IntegrityError as e:
+            if "UNIQUE" in str(e):
+                raise UserAlreadyExists(user.login)
     
     def get_user_by_id(self, id: int) -> UserReadDTO:
         self.__cursor.execute(GET_USER_BY_ID, id)
