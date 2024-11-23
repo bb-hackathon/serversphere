@@ -28,6 +28,8 @@ class UserRepo:
         return UserAuthDTO(**self.__cursor.fetchone())
     def validate_user(self, login: str, passw: str) -> Optional[int]:
         user = self.get_user_by_login(login)
+        if not user:
+            return None
         if not check_password(user.password, passw):
             return None
         return user.id if user else None

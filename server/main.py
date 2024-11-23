@@ -8,7 +8,7 @@ from users.infra.user_repo import UserRepo
 from users.rest.exc_handling import handlers
 from users.rest.rest import user_router
 from users.rest.admin import admin_router
-from db import CREATE_TABLE_USERS
+from db import CREATE_TABLE_DESKTOPS, CREATE_TABLE_USERS
 
 def init():
     app = FastAPI()
@@ -21,6 +21,8 @@ def init():
 def startapp():
     with connect('db.sqlite') as conn:
         conn.execute(CREATE_TABLE_USERS)
+        conn.execute(CREATE_TABLE_DESKTOPS)
+        conn.commit()
         try:
             usr_repo = UserRepo(cursor=conn.cursor())
             usr_repo.register_new_user(UserCreateDTO(login="admin", sshKey="Blank",isAdmin=True, password="admin"))

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 
+from desktops.infra.dto.desktops import DesktopCreateDTO
 from users.infra.dependency import get_cursor
 from users.infra.exceptions import NotAdmin
 from users.infra.user_repo import UserRepo
@@ -35,5 +36,8 @@ def users(cur = Depends(get_cursor)):
     return usr_repo.get_users()
 
 
+@admin_router.post('/registrer_desktop')
+def register_desktop(desktop: DesktopCreateDTO,cur = Depends(get_cursor)):
+    
 
 
