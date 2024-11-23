@@ -34,7 +34,7 @@ function fetchUsers() {
                 row.innerHTML = `
 <td>${user.id}</td>
 <td>${user.login}</td>
-<td>${user.isAdmin ? "Да" : "Нет"}</td>
+<td>${user.isAdmin ? "Администратор" : "Пользователь"}</td>
 <td>
 ${user.isAdmin
                         ? isCurrentUser
@@ -91,7 +91,7 @@ function makeAdmin(login) {
             return response.json();
         })
         .then(() => {
-            showNotification(`Пользователь "${login}" назначен администратором`, "success");
+            showNotification(`Смена статуса у "${login}"`, "success");
             fetchUsers();
         })
         .catch(error => {
@@ -128,13 +128,12 @@ function logoutUser() {
         .then(response => {
             if (!response.ok) {
                 throw new Error("Ошибка выхода");
-            } else {
-                showNotification("Вы успешно вышли из системы.", "success");
             }
             return response;
         })
         .then(() => {
-            window.location.href = "/";
+            showNotification("Вы вышли из аккаунта", "success");
+            setTimeout(() => window.location.href = "/", 2000);
         })
         .catch(error => {
             console.error("Ошибка выхода:", error);
@@ -160,14 +159,14 @@ function checkUserStatus() {
             currentUserLogin = name;
             const userInfo = document.getElementById("user-info");
             userInfo.innerHTML = `
-<div class="card shadow-sm p-3 bg-light rounded">
-<div class="card-body">
-<h5 class="card-title">Здравствуйте, <strong>${name}</strong>!</h5>
-<p class="card-text mb-1"><small class="text-muted">ID: ${id}</small></p>
-<p class="card-text"><small class="text-muted">SSH Key:</small><br><code>${sshKey}</code></p>
-</div>
-</div>
-`;
+                <div class="card shadow-sm p-3 bg-light rounded">
+                <div class="card-body">
+                <h5 class="card-title">Здравствуйте, <strong>${name}</strong>!</h5>
+                <p class="card-text mb-1"><small class="text-muted">ID: ${id}</small></p>
+                <p class="card-text"><small class="text-muted">SSH Key:</small><br><code>${sshKey}</code></p>
+                </div>
+                </div>
+            `;
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
                 logoutBtn.addEventListener("click", logoutUser);
@@ -286,7 +285,6 @@ ${isConnected
 }
 function addVM(ip, port, name, type = "Vm") {
     const url = "http://127.0.0.1:8000/admin/register_desktop";
-    // Формируем данные для отправки
     const requestData = {
         ip: ip,
         port: parseInt(port, 10),
@@ -311,7 +309,7 @@ function addVM(ip, port, name, type = "Vm") {
         })
         .then(data => {
             showNotification(`ВМ "${name}" успешно добавлена`, "success");
-            fetchVMs(); // Обновляем список ВМ после добавления
+            fetchVMs(); 
         })
         .catch(error => {
             console.error("Ошибка добавления ВМ:", error);
@@ -335,7 +333,7 @@ function deleteVM(name) {
         })
         .then(data => {
             showNotification(`ВМ "${name}" успешно удалена`, "success");
-            fetchVMs(); // Обновляем список ВМ после удаления
+            fetchVMs(); 
         })
         .catch(error => {
             console.error("Ошибка удаления ВМ:", error);
@@ -375,7 +373,7 @@ function connectVM(name, ip, port, newTab) {
                     vncFrame.src = data.url;
                     modal.style.display = "block";
                 }
-                fetchVMs(); // Обновляем список ВМ после подключения
+                fetchVMs();
             } else {
                 alert("Ошибка: " + data.message);
             }
@@ -402,7 +400,7 @@ function disconnectVM(name) {
                     modal.style.display = "none";
                     vncFrame.src = "";
                 }
-                fetchVMs(); // Обновляем список ВМ после отключения
+                fetchVMs(); 
             } else {
                 alert("Ошибка: " + data.message);
             }
