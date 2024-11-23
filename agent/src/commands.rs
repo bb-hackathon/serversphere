@@ -132,3 +132,16 @@ pub async fn set_ssh_credentials(
 pub struct SshCredentials {
     pubkey: String,
 }
+
+#[axum::debug_handler]
+#[instrument]
+pub async fn revoke_access() -> Result<(), StatusCode> {
+    tracing::warn!(message = "revoking access from all users");
+    restart_helper("sshd", Some("sshd.service"))?;
+    tracing::warn!(message = "setting ssh pubkey to bullshit");
+    set_ssh_credentials(Json(SshCredentials {
+        pubkey: String::from("ssh-"),
+    }))
+    .await?;
+    Ok(())
+}
