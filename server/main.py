@@ -9,11 +9,13 @@ from users.rest.exc_handling import handlers
 from users.rest.rest import user_router
 from users.rest.admin import admin_router
 from db import CREATE_TABLE_DESKTOPS, CREATE_TABLE_USERS
+from fastapi.middleware.cors import CORSMiddleware
 
 def init():
     app = FastAPI()
     app.include_router(user_router)
     app.include_router(admin_router)
+    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
     handlers(app)
     return app
 
