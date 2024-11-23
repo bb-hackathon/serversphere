@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Response
 
-from desktops.exceptions import AlreadyReserved, InvalidReservation
+from desktops.exceptions import AlreadyReserved, InvalidReservation, VmIsDead
 from desktops.infra import desktop_repo
 from desktops.infra.desktop_repo import DesktopRepo
 from desktops.infra.dto.reservation import ReservationTimeDTO
@@ -54,4 +54,10 @@ def delete_desktop(request: Request, name: str, cur = Depends(get_cursor), _ = D
 @desktop_router.get("/metrics")
 def get_metrics(name:str, cur = Depends(get_cursor), _ = Depends(get_user_id)):
     dsk_repo = DesktopRepo(cur)
-    return dsk_repo.get_metrics(name)
+    try:
+        return dsk_repo.get_metrics(name)
+    except VmIsDead as e:
+        return Response(e.message, status_code=status.HTTP_400_BAD_REQUEST)
+    
+
+

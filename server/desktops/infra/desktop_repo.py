@@ -8,8 +8,9 @@ from typing import Optional
 from requests import request
 
 from common.exceptions import EntityNotFound
-from desktops.exceptions import AlreadyReserved, InvalidReservation
+from desktops.exceptions import AlreadyReserved, InvalidReservation, VmIsDead
 from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO, DesktopType
+from desktops.infra.dto.metrics import MetricsDTO
 from desktops.infra.dto.reservation import ReservationDTO, check_reservation
 from desktops.infra.sql_queries import (
     CREATE_NEW_DESKTOP,
@@ -116,4 +117,8 @@ class DesktopRepo:
         self.__cursor.connection.commit()
 
     def get_metrics(self, name):
-        request("GET", "")
+        vm = self.get_desktop_by_name(name)
+        if not vm.isAlive:
+            raise VmIsDead(vm.name)
+
+        return MetricsDTO(**(request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics").json()))

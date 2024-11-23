@@ -21,7 +21,6 @@ def check_for_reservations():
         ):
             
             dsk_repo.delete_reservation(res.id)
-    print(1)
     res = dsk_repo.get()
     for vm in res:
         try:
