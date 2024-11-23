@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "testhack"
+version = "0.1.0"
+description = ""
+authors = ["sjewyr <ganshin.2004@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.5"
+psycopg = "^3.2.3"
+pydantic = "^2.10.1"
+bcrypt = "^4.2.1"
+uvicorn = "^0.32.1"
+python-multipart = "^0.0.17"
+pyjwt = "^2.10.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.7.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
