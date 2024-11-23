@@ -1,3 +1,6 @@
+> [!CAUTION]
+> The agent needs to be run as root! Otherwise most of the API endpoints will fail with unsufficient permissions. The bundled `serversphere-agent.service` runs the binary as root.
+
 #### Running locally
 
 ```nushell
