@@ -1,6 +1,6 @@
 //TODO: fix user login status
 const vmList = [
-    { name: "Ubuntu Linux", ip: "93.183.82.91", port: "5901" } // Предустановленное устройство
+    { name: "Ubuntu Linux", ip: "93.183.82.91", port: "5901" }
 ];
 const connectionStatus = {};
 
@@ -16,6 +16,44 @@ const closeModalBtn = document.getElementById("close-modal");
 
 let isDragging = false;
 let offsetX = 0, offsetY = 0;
+
+function showNotification(message, type) {
+    const notification = $(`<div class="notification ${type}">${message}</div>`);
+    $(".notifications").append(notification);
+    setTimeout(() => notification.remove(), 4000);
+}
+
+function fetchUsers() {
+    fetch("http://127.0.0.1:8000/users")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Не удалось загрузить пользователей");
+            }
+            return response.json();
+        })
+        .then(users => {
+            const userTableBody = document.getElementById("user-table-body");
+            userTableBody.innerHTML = "";
+
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.login}</td>
+                    <td>${user.isAdmin ? "Да" : "Нет"}</td>
+                `;
+                userTableBody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error("Ошибка загрузки пользователей:", error);
+            showNotification("Не удалось загрузить список пользователей.", "error");
+        });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchUsers();
+});
 
 function openChartsPage(vmName) {
     window.location.href = `/charts?vm=${encodeURIComponent(vmName)}`;
