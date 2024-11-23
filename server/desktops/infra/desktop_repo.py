@@ -5,18 +5,22 @@ from sqlite3 import Cursor, IntegrityError
 import subprocess
 from typing import Optional
 
+from requests import request
+
 from common.exceptions import EntityNotFound
 from desktops.exceptions import AlreadyReserved, InvalidReservation
 from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO, DesktopType
 from desktops.infra.dto.reservation import ReservationDTO, check_reservation
 from desktops.infra.sql_queries import (
     CREATE_NEW_DESKTOP,
+    DELETE_DESKTOP,
     DELETE_RESERVATION,
     GET_DESKTOP_BY_NAME,
     GET_DESKTOPS,
     GET_RESERVATIONS,
     GET_RESERVATIONS_ON_DESKTOP,
     SET_RESERVATION,
+    UPDATE_STATUS,
 )
 from users.infra.exceptions import DesktopAlreadyExists
 
@@ -87,7 +91,7 @@ class DesktopRepo:
         self.__cursor.connection.commit()
 
     def delete_vm(self, name):
-        self.__cursor.execute(DELETE_RESERVATION, (name,))
+        self.__cursor.execute(DELETE_DESKTOP, (name,))
         self.__cursor.connection.commit()
 
 
@@ -106,3 +110,10 @@ class DesktopRepo:
                 pass
 
         return res
+    
+    def update_status(self, isAlive:bool, id:int):
+        self.__cursor.execute(UPDATE_STATUS, (isAlive, id))
+        self.__cursor.connection.commit()
+
+    def get_metrics(self, name):
+        request("GET", "")

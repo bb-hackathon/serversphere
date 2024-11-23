@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS desktops (
     name TEXT NOT NULL UNIQUE,
     type TEXT NOT NULL,
     ip TEXT NOT NULL,
-    port INTEGER NOT NULL
+    port INTEGER NOT NULL,
+    isAlive INTEGER DEFAULT 0
 )
 """
 

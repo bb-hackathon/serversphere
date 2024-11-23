@@ -25,10 +25,13 @@ def check_for_reservations():
     res = dsk_repo.get()
     for vm in res:
         try:
-            res = request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics", timeout=1)
-            print(res.content)
+            res = request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/status", timeout=1.5)
+            assert res.status_code == 200
+            dsk_repo.update_status(isAlive=True, id=vm.id)
+            
         except:
-            print("fail")
+            dsk_repo.update_status(isAlive=False, id=vm.id)
+            
         
 
 

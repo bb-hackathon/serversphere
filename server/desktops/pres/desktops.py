@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response
 
 from desktops.exceptions import AlreadyReserved, InvalidReservation
+from desktops.infra import desktop_repo
 from desktops.infra.desktop_repo import DesktopRepo
 from desktops.infra.dto.reservation import ReservationTimeDTO
 from users.infra.dependency import get_cursor, get_user_id
@@ -49,3 +50,8 @@ def get_reservations(request:Request, cur=Depends(get_cursor)):
 def delete_desktop(request: Request, name: str, cur = Depends(get_cursor), _ = Depends(check_admin_rights)):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.delete_vm(name)
+
+@desktop_router.get("/metrics")
+def get_metrics(name:str, cur = Depends(get_cursor), _ = Depends(get_user_id)):
+    dsk_repo = DesktopRepo(cur)
+    return dsk_repo.get_metrics(name)
