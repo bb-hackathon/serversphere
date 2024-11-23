@@ -54,12 +54,15 @@ pub async fn metrics() -> Result<Json<MetricsResponse>, StatusCode> {
 #[instrument]
 pub async fn restart_sshd() -> Result<&'static str, StatusCode> {
     tracing::debug!(message = "sshd restart requested");
-    kill_process_by_name("sshd")?;
+    restart_helper("sshd", Some("sshd.service"))?;
     Ok("sshd restared. all ssh sessions should be closed by now")
 }
 
-#[instrument(name = "restart_helper")]
-fn kill_process_by_name(process_name: &'static str) -> Result<(), StatusCode> {
+#[instrument]
+fn restart_helper(
+    process_name: &'static str,
+    restart_unit: Option<&'static str>,
+) -> Result<(), StatusCode> {
     // God forgive me for what I am about to do...
     tracing::debug!("attempting to kill {process_name:?}");
     let status = Command::new("pkill")
@@ -74,6 +77,25 @@ fn kill_process_by_name(process_name: &'static str) -> Result<(), StatusCode> {
     }
 
     tracing::debug!("{process_name:?} should be restarted by now");
+
+    if let Some(unit) = restart_unit {
+        let delay = Duration::from_millis(300);
+        tracing::debug!("waiting {delay:?} before restarting {unit:?}");
+        thread::sleep(delay);
+
+        let status = Command::new("systemctl")
+            .args(["restart", unit])
+            .output()
+            .inspect_err(|error| {
+                tracing::error!(message = "error restarting systemd unit", ?unit, ?error);
+            })
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+            .status;
+        if !status.success() {
+            tracing::error!(message = "systemd restart command returned nonzero exit code");
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    }
 
     Ok(())
 }
