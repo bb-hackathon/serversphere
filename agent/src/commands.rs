@@ -1,7 +1,8 @@
 use axum::{http::StatusCode, Json};
 use nix::sys::reboot::RebootMode;
 use serde::{Deserialize, Serialize};
-use std::{convert::Infallible, fs, io, process::Command, thread, time::Duration};
+use std::{collections::HashMap, convert::Infallible, process::Command, time::Duration};
+use std::{fs, io, thread};
 use sysinfo::System;
 use tracing::instrument;
 
@@ -27,6 +28,7 @@ pub struct MetricsResponse {
     cpu_usage: f64,
     ram_usage: f64,
     process_count: usize,
+    process_uptimes: HashMap<String, u64>,
 }
 
 impl MetricsResponse {
@@ -36,6 +38,23 @@ impl MetricsResponse {
             cpu_usage: (system.global_cpu_usage() / 100.0_f32).into(),
             ram_usage: system.used_memory() as f64 / system.total_memory() as f64,
             process_count: system.processes().len(),
+            process_uptimes: system
+                .processes()
+                .values()
+                .filter(|p| p.user_id().is_some_and(|uid| **uid >= 1000))
+                // .sorted_by_key(|p| p.run_time())
+                // .rev()
+                .take(10)
+                .map(|process| {
+                    let name = process
+                        .exe()
+                        .and_then(|p| p.file_stem())
+                        .unwrap_or_else(|| process.name())
+                        .to_string_lossy()
+                        .to_string();
+                    (name, process.run_time())
+                })
+                .collect(),
         }
     }
 }
