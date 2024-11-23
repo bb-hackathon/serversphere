@@ -18,6 +18,7 @@ pub const PORT: u16 = 8000;
 #[instrument(name = "agent_main")]
 pub async fn run_agent() -> Result<(), crate::Error> {
     let router = Router::new()
+        .route("/credentials/sshd", post(commands::set_ssh_credentials))
         .route("/metrics", get(commands::metrics))
         .route("/reboot", post(commands::reboot))
         .route("/restart/sshd", post(commands::restart_sshd))

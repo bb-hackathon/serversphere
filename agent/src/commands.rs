@@ -1,7 +1,7 @@
 use axum::{http::StatusCode, Json};
 use nix::sys::reboot::RebootMode;
-use serde::Serialize;
-use std::{convert::Infallible, io, process::Command, thread, time::Duration};
+use serde::{Deserialize, Serialize};
+use std::{convert::Infallible, fs, io, process::Command, thread, time::Duration};
 use sysinfo::System;
 use tracing::instrument;
 
@@ -106,4 +106,25 @@ fn restart_helper(
     }
 
     Ok(())
+}
+
+#[axum::debug_handler]
+#[instrument(skip_all)]
+pub async fn set_ssh_credentials(
+    Json(credentials): Json<SshCredentials>,
+) -> Result<(), StatusCode> {
+    tracing::debug!(message = "setting ssh credentials", pubkey = ?credentials.pubkey);
+    fs::write("/root/.ssh/authorized_keys", credentials.pubkey)
+        .inspect(|()| tracing::debug!(message = "set up new sshd credentials"))
+        .inspect_err(|error| tracing::error!(message = "error settings sshd credentials", ?error))
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    restart_helper("sshd", Some("sshd.service"))?;
+
+    Ok(())
+}
+
+#[derive(Deserialize)]
+pub struct SshCredentials {
+    pubkey: String,
 }
