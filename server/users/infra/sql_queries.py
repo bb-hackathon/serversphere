@@ -7,6 +7,10 @@ SELECT id, login, isAdmin, sshKey FROM users WHERE id = ?
 """
 
 GET_USER_BY_LOGIN = """--sql
-SELECT id, login, password, isAdmin FROM users WHERE login = ?
+SELECT id, login, password, isAdmin, sshKey FROM users WHERE login = ?
 
+"""
+
+REVERT_ADMIN = """--sql
+UPDATE users SET isAdmin = ? WHERE login = ?
 """

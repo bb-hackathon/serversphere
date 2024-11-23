@@ -20,10 +20,12 @@ def check_admin_rights(request: Request, cur = Depends(get_cursor)):
         raise NotAdmin
 
 admin_router = APIRouter(prefix="/admin", dependencies=[Depends(check_admin_rights)])
-admin_router
+
 
 @admin_router.post('/give_admin')
 def give_admin(request:Request, login: str, cur = Depends(get_cursor)):
     usr_repo = UserRepo(cur)
+    usr_repo.invert_admin(login)
+    
 
 

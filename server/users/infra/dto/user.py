@@ -3,14 +3,19 @@ from common.dto.entity import BaseEntity
 import bcrypt
 
 class BaseUser(BaseModel):
-     login: str
-     sshKey: str
-     
-
-class UserReadDTO(BaseUser, BaseEntity):
+    login: str
+    sshKey: str
     isAdmin: bool
+    
+class UserReadDTO(BaseUser, BaseEntity):
+    pass
+    
+    
+class UserAuthDTO(BaseUser, BaseEntity):
+    password: str
+    
 
-class UserAuthDTO(BaseUser):
+class UserCreateDTO(BaseUser):
     password: str
     
 

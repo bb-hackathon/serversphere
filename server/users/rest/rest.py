@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, Request, Response
 import jwt
 
 from users.infra.dependency import get_cursor
-from users.infra.dto.user import UserAuthDTO
+from users.infra.dto.user import UserAuthDTO, UserCreateDTO
 from users.infra.exceptions import UserAlreadyExists
 from users.infra.user_repo import UserRepo
 from users.rest.tokens import detokenize, tokenize
@@ -11,7 +11,7 @@ from starlette import status
 user_router = APIRouter(prefix="/users")
 
 @user_router.post('/login')
-def login(request: Request, login: str = Form(), password: str = Form(), cur = Depends(get_cursor)):
+def login(login: str = Form(), password: str = Form(), cur = Depends(get_cursor)):
     user_repo = UserRepo(cur)
     res = user_repo.validate_user(login, password)
     if not res:
@@ -35,7 +35,7 @@ def user_status(request: Request, cur = Depends(get_cursor)):
 
 
 @user_router.post("/register")
-def register(user: UserAuthDTO, cur = Depends(get_cursor)):
+def register(user: UserCreateDTO, cur = Depends(get_cursor)):
     user_repo = UserRepo(cur)
     try:
         user_repo.register_new_user(user)
