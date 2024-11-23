@@ -1,4 +1,7 @@
-const vmList = []; 
+//TODO: fix user login status
+const vmList = [
+    { name: "Ubuntu Linux", ip: "93.183.82.91", port: "5901" } // Предустановленное устройство
+];
 const connectionStatus = {};
 
 const vmTableBody = document.getElementById("vm-table-body");

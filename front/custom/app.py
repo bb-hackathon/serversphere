@@ -21,7 +21,6 @@ def charts():
     vm_name = request.args.get('vm', 'Unknown VM')
     return render_template('charts.html', vm_name=vm_name)
 
-
 @app.route('/api/metrics', methods=['GET'])
 def system_status():
     cpu_load = psutil.cpu_percent(interval=1)
@@ -83,4 +82,5 @@ def cleanup():
         process_info["process"].terminate()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=80)
+

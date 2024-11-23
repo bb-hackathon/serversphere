@@ -8,6 +8,11 @@ h1 {
     font-size: 2.5rem;
 }
 
+td button {
+    margin-right: 2px;
+}
+
+
 #vm-list {
     margin-top: 30px;
 }
