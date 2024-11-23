@@ -54,7 +54,12 @@ pub async fn metrics() -> Result<Json<MetricsResponse>, StatusCode> {
 #[instrument]
 pub async fn restart_sshd() -> Result<&'static str, StatusCode> {
     tracing::debug!(message = "sshd restart requested");
-    restart_helper("sshd", Some("sshd.service"))?;
+    let sshd_failed = restart_helper("sshd", Some("sshd.service")).is_err();
+    if sshd_failed {
+        // HACK: may be `ssh.service` instead of `sshd.service`,
+        // this will attempt one more time with that one.
+        restart_helper("ssh", Some("ssh.service"))?;
+    }
     Ok("sshd restared. all ssh sessions should be closed by now")
 }
 
