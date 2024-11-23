@@ -307,7 +307,7 @@ a:hover,a:focus{
 
         fetch("http://127.0.0.1:8000/users/login", {
             method: "POST",
-            body: formData
+            body: formData,
             credentials: "include"
         })
         .then(response => {
