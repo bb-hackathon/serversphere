@@ -19,13 +19,14 @@ class UserRepo:
             if "UNIQUE" in str(e):
                 raise UserAlreadyExists(user.login)
     
-    def get_user_by_id(self, id: int) -> UserReadDTO:
+    def get_user_by_id(self, id: int) -> Optional[UserReadDTO]:
         self.__cursor.execute(GET_USER_BY_ID, id)
-
-        return UserReadDTO(**self.__cursor.fetchone())
-    def get_user_by_login(self, login: str) -> UserAuthDTO:
+        res = self.__cursor.fetchone()
+        return UserReadDTO(**res) if res else None
+    def get_user_by_login(self, login: str) -> Optional[UserAuthDTO]:
         self.__cursor.execute(GET_USER_BY_LOGIN, (login,))
-        return UserAuthDTO(**self.__cursor.fetchone())
+        res = self.__cursor.fetchone()
+        return UserAuthDTO(**res) if res else None 
     def validate_user(self, login: str, passw: str) -> Optional[int]:
         user = self.get_user_by_login(login)
         if not user:
@@ -37,6 +38,8 @@ class UserRepo:
 
     def invert_admin(self, login: str):
         user = self.get_user_by_login(login)
+        if not user:
+            return None
         is_admin = user.isAdmin
         self.__cursor.execute(REVERT_ADMIN, (not is_admin, login))
         self.__cursor.connection.commit()

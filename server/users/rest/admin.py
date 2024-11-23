@@ -36,8 +36,8 @@ def users(cur = Depends(get_cursor)):
     return usr_repo.get_users()
 
 
-@admin_router.post('/registrer_desktop')
+@admin_router.post('/register_desktop')
 def register_desktop(desktop: DesktopCreateDTO,cur = Depends(get_cursor)):
-    
+    pass
 
 
