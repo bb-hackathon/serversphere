@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Form, Request, Response
 import jwt
 
-from users.infra.dependency import get_cursor
+from users.infra.dependency import get_cursor, get_user_id
 from users.infra.dto.user import UserAuthDTO, UserCreateDTO
 from users.infra.exceptions import UserAlreadyExists
 from users.infra.user_repo import UserRepo
@@ -56,3 +56,10 @@ def register(user: UserCreateDTO, cur=Depends(get_cursor)):
 def delete_user(login: str, cur=Depends(get_cursor)):
     user_repo = UserRepo(cur)
     user_repo.delete_user(login)
+
+@user_router.post("/logout")
+def logout(cur=Depends(get_cursor), _ = Depends(get_user_id)):
+    response = Response()
+    response.set_cookie(key="user", value="", httponly=True)
+    response.status_code = status.HTTP_200_OK
+    return response
