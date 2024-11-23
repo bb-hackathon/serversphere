@@ -19,21 +19,20 @@ def check_for_reservations():
             datetime.datetime.fromisoformat(res.reservedUntil).timestamp()
             < datetime.datetime.now().timestamp()
         ):
-            
             dsk_repo.delete_reservation(res.id)
     res = dsk_repo.get()
     for vm in res:
         try:
-            res = request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/status", timeout=1.5)
+            res = request(
+                "GET",
+                f"http://{vm.ip}:{vm.port}/serversphere/agent/status",
+                timeout=1.5,
+            )
             assert res.status_code == 200
             dsk_repo.update_status(isAlive=True, id=vm.id)
-            
+
         except:
             dsk_repo.update_status(isAlive=False, id=vm.id)
-            
-        
-
-
 
     try:
         gen.__next__()

@@ -56,9 +56,13 @@ class DesktopRepo:
 
         for row in res:
             reserv = ReservationDTO(**row)
-            if check_reservation(reserv, datetime.datetime.fromisoformat(until).timestamp()) or check_reservation(reserv, datetime.datetime.fromisoformat(_from).timestamp()):
+            if check_reservation(
+                reserv, datetime.datetime.fromisoformat(until).timestamp()
+            ) or check_reservation(
+                reserv, datetime.datetime.fromisoformat(_from).timestamp()
+            ):
                 return True
-        
+
         return False
 
     def reserve(self, name: str, _from: str, until: str, by: int):
@@ -67,14 +71,14 @@ class DesktopRepo:
             raise EntityNotFound(name)
 
         reserved = self.check_reserved(desktop.id, _from, until)
-        if datetime.datetime.now().timestamp() > datetime.datetime.fromisoformat(until).timestamp():
+        if (
+            datetime.datetime.now().timestamp()
+            > datetime.datetime.fromisoformat(until).timestamp()
+        ):
             raise InvalidReservation
         print(reserved)
         if reserved:
             raise AlreadyReserved(name)
-
-
-        
 
         self.__cursor.execute(SET_RESERVATION, (_from, until, by, desktop.id))
         self.__cursor.connection.commit()
@@ -82,7 +86,7 @@ class DesktopRepo:
     def get_reservations(self) -> list[ReservationDTO]:
         self.__cursor.execute(GET_RESERVATIONS)
         return list(self.__cursor.fetchall())
-    
+
     def get_reservations_on_desktop(self) -> list[ReservationDTO]:
         self.__cursor.execute(GET_RESERVATIONS_ON_DESKTOP)
         return list(self.__cursor.fetchall())
@@ -95,24 +99,25 @@ class DesktopRepo:
         self.__cursor.execute(DELETE_DESKTOP, (name,))
         self.__cursor.connection.commit()
 
-
     def get_multipass_vm(self):
         try:
-            res = subprocess.check_output(['multipass', 'list', '--format', 'json'])
+            res = subprocess.check_output(["multipass", "list", "--format", "json"])
             json.loads(res)
         except:
             return None
         ls = res["list"]
         for obj in ls:
-            vm = DesktopCreateDTO(name=obj["name"], ip=obj["ipv4"][0], type=DesktopType.VM)
+            vm = DesktopCreateDTO(
+                name=obj["name"], ip=obj["ipv4"][0], type=DesktopType.VM
+            )
             try:
                 self.create_new_desktop(vm)
             except DesktopAlreadyExists:
                 pass
 
         return res
-    
-    def update_status(self, isAlive:bool, id:int):
+
+    def update_status(self, isAlive: bool, id: int):
         self.__cursor.execute(UPDATE_STATUS, (isAlive, id))
         self.__cursor.connection.commit()
 
@@ -121,4 +126,10 @@ class DesktopRepo:
         if not vm.isAlive:
             raise VmIsDead(vm.name)
 
-        return MetricsDTO(**(request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics").json()))
+        return MetricsDTO(
+            **(
+                request(
+                    "GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics"
+                ).json()
+            )
+        )

@@ -65,8 +65,6 @@ class UserRepo:
         res = self.__cursor.fetchall()
         return list(map(lambda row: UserReadDTO(**row), res))
 
-
     def delete_user(self, name):
         self.__cursor.execute(DELETE_USER, (name,))
         self.__cursor.connection.commit()
-        

@@ -20,7 +20,7 @@ class BaseDesktop(BaseModel):
 
 
 class DesktopReadDTO(BaseDesktop, BaseEntity):
-    isAlive:bool = False
+    isAlive: bool = False
 
 
 class DesktopCreateDTO(BaseDesktop):

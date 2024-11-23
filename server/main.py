@@ -33,7 +33,7 @@ def init():
             "GET",
             "POST",
             "OPTIONS",
-            "DELETE"
+            "DELETE",
         ],  # include additional methods as per the application demand
         allow_headers=[
             "Content-Type",

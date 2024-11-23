@@ -36,28 +36,31 @@ def reserve(
 
 
 @desktop_router.get("/get_reservations")
-def get_reservations(request:Request, name:str, _=Depends(get_user_id), cur=Depends(get_cursor)):
+def get_reservations(
+    request: Request, name: str, _=Depends(get_user_id), cur=Depends(get_cursor)
+):
     dsk_repo = DesktopRepo(cur)
     return list(map(lambda x: ReservationTimeDTO(**x), dsk_repo.get_reservations()))
 
+
 @desktop_router.get("/fetch_desktops")
-def get_reservations(request:Request, cur=Depends(get_cursor)):
+def get_reservations(request: Request, cur=Depends(get_cursor)):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.get_multipass_vm()
 
 
 @desktop_router.delete("/")
-def delete_desktop(request: Request, name: str, cur = Depends(get_cursor), _ = Depends(check_admin_rights)):
+def delete_desktop(
+    request: Request, name: str, cur=Depends(get_cursor), _=Depends(check_admin_rights)
+):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.delete_vm(name)
 
+
 @desktop_router.get("/metrics")
-def get_metrics(name:str, cur = Depends(get_cursor), _ = Depends(get_user_id)):
+def get_metrics(name: str, cur=Depends(get_cursor), _=Depends(get_user_id)):
     dsk_repo = DesktopRepo(cur)
     try:
         return dsk_repo.get_metrics(name)
     except VmIsDead as e:
         return Response(e.message, status_code=status.HTTP_400_BAD_REQUEST)
-    
-
-

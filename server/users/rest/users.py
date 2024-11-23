@@ -52,14 +52,14 @@ def register(user: UserCreateDTO, cur=Depends(get_cursor)):
     return Response("Created", status.HTTP_201_CREATED)
 
 
-
 @user_router.delete("/")
-def delete_user(login: str, cur=Depends(get_cursor), _ = Depends(check_admin_rights)):
+def delete_user(login: str, cur=Depends(get_cursor), _=Depends(check_admin_rights)):
     user_repo = UserRepo(cur)
     user_repo.delete_user(login)
 
+
 @user_router.post("/logout")
-def logout(cur=Depends(get_cursor), _ = Depends(get_user_id)):
+def logout(cur=Depends(get_cursor), _=Depends(get_user_id)):
     response = Response()
     response.set_cookie(key="user", value="", httponly=True)
     response.status_code = status.HTTP_200_OK
