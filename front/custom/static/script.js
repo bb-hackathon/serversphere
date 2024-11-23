@@ -24,7 +24,7 @@ function showNotification(message, type) {
 }
 
 function fetchUsers() {
-    fetch("http://127.0.0.1:8000/users")
+    fetch("http://127.0.0.1:8000/admin/users",{credentials: "include"})
         .then(response => {
             if (!response.ok) {
                 throw new Error("Не удалось загрузить пользователей");
@@ -59,12 +59,11 @@ function fetchUsers() {
 }
 
 function makeAdmin(login) {
-    fetch("http://127.0.0.1:8000/admin/give_admin", {
+    const url = `http://127.0.0.1:8000/admin/give_admin?login=${encodeURIComponent(login)}`;
+    
+    fetch(url, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ login: login })
+        credentials: "include"
     })
     .then(response => {
         if (!response.ok) {
@@ -74,7 +73,7 @@ function makeAdmin(login) {
     })
     .then(() => {
         showNotification(`Пользователь "${login}" назначен администратором`, "success");
-        fetchUsers();
+        fetchUsers(); 
     })
     .catch(error => {
         console.error("Ошибка назначения администратора:", error);
@@ -150,7 +149,8 @@ function bookVM(vmName) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(bookingData)
+        body: JSON.stringify(bookingData),
+        credentials: "include"
     })
     .then(response => response.json())
     .then(data => {
@@ -236,7 +236,8 @@ function connectVM(index, newTab) {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(vm)
+        body: JSON.stringify(vm),
+        credentials: "include"
     })
     .then(response => response.json())
     .then(data => {
@@ -271,7 +272,8 @@ function disconnectVM(index) {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ name: vm.name })
+        body: JSON.stringify({ name: vm.name }),
+        credentials: "include"
     })
     .then(response => response.json())
     .then(data => {
