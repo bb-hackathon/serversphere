@@ -20,6 +20,7 @@ pub async fn run_agent() -> Result<(), crate::Error> {
     let router = Router::new()
         .route("/status", get(health_check))
         .route("/metrics", get(commands::metrics))
+        .route("/restart/sshd", post(commands::restart_sshd))
         .route("/reboot", post(commands::reboot));
 
     let addr = (Ipv4Addr::UNSPECIFIED, PORT);

@@ -1,7 +1,7 @@
 use axum::{http::StatusCode, Json};
 use nix::sys::reboot::RebootMode;
 use serde::Serialize;
-use std::{convert::Infallible, io, thread, time::Duration};
+use std::{convert::Infallible, io, process::Command, thread, time::Duration};
 use sysinfo::System;
 use tracing::instrument;
 
@@ -43,8 +43,37 @@ impl MetricsResponse {
 #[axum::debug_handler]
 #[instrument]
 pub async fn metrics() -> Result<Json<MetricsResponse>, StatusCode> {
+    tracing::debug!(message = "metrics requested, collecting");
     let mut system = System::new_all();
     system.refresh_all();
     let response = MetricsResponse::new(&system);
     Ok(Json(response))
+}
+
+#[axum::debug_handler]
+#[instrument]
+pub async fn restart_sshd() -> Result<&'static str, StatusCode> {
+    tracing::debug!(message = "sshd restart requested");
+    kill_process_by_name("sshd")?;
+    Ok("sshd restared. all ssh sessions should be closed by now")
+}
+
+#[instrument(name = "restart_helper")]
+fn kill_process_by_name(process_name: &'static str) -> Result<(), StatusCode> {
+    // God forgive me for what I am about to do...
+    tracing::debug!("attempting to kill {process_name:?}");
+    let status = Command::new("pkill")
+        .args(["-ef", process_name])
+        .output()
+        .inspect_err(|error| tracing::error!(message = "error collecting command output", ?error))
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .status;
+    if !status.success() {
+        tracing::error!(message = "restart command returned nonzero exit code");
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    tracing::debug!("{process_name:?} should be restarted by now");
+
+    Ok(())
 }
