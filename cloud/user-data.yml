@@ -1,7 +1,12 @@
 #cloud-config
-password: "12345" # ubuntu:12345
+password: "12345"
 chpasswd:
   expire: False
+
+allow_public_ssh_keys: true
+disable_root: false
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
+ssh_authorized_keys: [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvBw3klXzVq5oTXtS061cfcGEjHWflPZNRBRg48N3w/ astrumaureus@Nox" ]
 
 runcmd:
   - |
