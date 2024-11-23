@@ -130,6 +130,8 @@ class DesktopRepo:
 
     def get_metrics(self, name):
         vm = self.get_desktop_by_name(name)
+        if not vm:
+            raise EntityNotFound
         if not vm.isAlive:
             raise VmIsDead(vm.name)
 
