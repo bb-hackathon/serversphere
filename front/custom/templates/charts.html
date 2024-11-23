@@ -97,6 +97,16 @@
             </select>
         </div>
 
+        <div class="controls">
+            <label for="processesChartType">Выберите тип графика для процессов:</label>
+            <select id="processesChartType">
+                <option value="line">Линейный</option>
+                <option value="bar">Столбчатый</option>
+                <option value="radar">Радарный</option>
+                <option value="pie">Круговой</option>
+            </select>
+        </div>
+
         <div class="chart-container">
             <div class="charts-title">Загрузка процессора (%)</div>
             <canvas id="cpuChart"></canvas>
@@ -105,6 +115,11 @@
         <div class="chart-container">
             <div class="charts-title">Использование памяти (%)</div>
             <canvas id="memoryChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <div class="charts-title">Количество процессов</div>
+            <canvas id="processesChart"></canvas>
         </div>
     </div>
 
@@ -115,6 +130,7 @@
     <script>
         const cpuCtx = document.getElementById('cpuChart').getContext('2d');
         const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+        const processesCtx = document.getElementById('processesChart').getContext('2d');
 
         const cpuData = {
             labels: [],
@@ -131,6 +147,17 @@
             labels: [],
             datasets: [{
                 label: 'Использование памяти (%)',
+                data: [],
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        };
+        const processesData = {
+            labels: [],
+            datasets: [{
+                label: 'Количество процессов',
                 data: [],
                 borderColor: 'rgba(255, 99, 132, 1)',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -179,8 +206,29 @@
             }
         };
 
+        const processesConfig = {
+            type: 'line',
+            data: processesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Точки времени' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 300,
+                        title: { display: true, text: 'Количество' }
+                    }
+                }
+            }
+        };
+
         const cpuChart = new Chart(cpuCtx, cpuConfig);
         const memoryChart = new Chart(memoryCtx, memoryConfig);
+        const processesChart = new Chart(processesCtx, processesConfig);
 
         function updateCpuChartType() {
             const selectedType = document.getElementById('cpuChartType').value;
@@ -194,12 +242,21 @@
             memoryChart.update();
         }
 
+        function updateProcessesChartType() {
+            const selectedType = document.getElementById('processesChartType').value;
+            processesChart.config.type = selectedType;
+            processesChart.update();
+        }
+
         document.getElementById('cpuChartType').addEventListener('change', updateCpuChartType);
         document.getElementById('memoryChartType').addEventListener('change', updateMemoryChartType);
+        document.getElementById('processesChartType').addEventListener('change', updateMemoryChartType);
 
-        async function fetchData() {
+        document.getElementById('')
+
+        async function fetchData(vmname) {
             try {
-                const response = await fetch('/api/metrics');
+                const response = await fetch('http://127.0.0.1:8000/desktops/metrics?name={{vm_name}}', {credentials: "include"});
                 const dataFromServer = await response.json();
 
                 const currentTime = cpuData.labels.length + 1;
@@ -208,20 +265,29 @@
                 cpuData.datasets[0].data.push(dataFromServer.cpu_load);
                 
                 memoryData.labels.push(currentTime);
-                memoryData.datasets[0].data.push(dataFromServer.memory_usage);
+                memoryData.datasets[0].data.push(dataFromServer.ram_usage);
 
-                if (cpuData.labels.length > 50) {
+                processesData.labels.push(currentTime);
+                processesData.datasets[0].data.push(dataFromServer.proccess_count);
+
+                if (cpuData.labels.length > 30) {
                     cpuData.labels.shift();
                     cpuData.datasets[0].data.shift();
                 }
 
-                if (memoryData.labels.length > 50) {
+                if (memoryData.labels.length > 30) {
+                    memoryData.labels.shift();
+                    memoryData.datasets[0].data.shift();
+                }
+
+                if (processesData.labels.length > 30) {
                     memoryData.labels.shift();
                     memoryData.datasets[0].data.shift();
                 }
 
                 cpuChart.update();
                 memoryChart.update();
+                processesChart.update();
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }

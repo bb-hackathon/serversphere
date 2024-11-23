@@ -296,7 +296,7 @@ function renderVMList() {
                         ? `<button onclick="disconnectVM(${index})" class="btn btn-warning">Отключить</button>`
                         : ''
                 }
-                <button onclick="openChartsPage('${index}')" class="btn btn-info">Показать графики</button>
+                <button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
                 <button onclick="openBookVM(${index})" class="btn btn-success">Бронь</button>
                 <button onclick="deleteVM(${index})" class="btn btn-danger">Удалить</button>
             </td>
