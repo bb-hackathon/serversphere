@@ -87,7 +87,7 @@ class DesktopRepo:
         self.__cursor.connection.commit()
 
 
-    def get_multipass_vm():
+    def get_multipass_vm(self):
         res = subprocess.check_output(['multipass', '--list'])
         json.loads(res)
         print(res)
