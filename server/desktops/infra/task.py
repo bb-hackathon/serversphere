@@ -1,5 +1,6 @@
 from ast import excepthandler
 import datetime
+import logging
 from fastapi import Depends
 from requests import request
 
@@ -22,6 +23,15 @@ def check_for_reservations():
             < datetime.datetime.now().timestamp()
         ):
             dsk_repo.delete_reservation(res.id)
+            vm = dsk_repo.get_desktop_by_id(res.reservedDesktop)
+            try:
+                req = request("POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/revoke_access", timeout=1.5)
+                if req.status_code>=400:
+                    logging.critical(f"Failed to revoke access from {vm.ip}:{vm.port}")
+                    continue
+            except:
+                logging.critical(f"Failed to revoke access from {vm.ip}:{vm.port}")
+
 
         if (
             datetime.datetime.fromisoformat(res.reservedFrom).timestamp()
@@ -39,9 +49,11 @@ def check_for_reservations():
                 continue
             try:
                 req = request("POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/credentials/sshd", json={"pubkey": user.sshKey}, timeout=1)
-                if req.status_code == 400:
+                if req.status_code >= 400:
+                    logging.warning(f"Failed to add ssh keys on {vm.ip}:{vm.port}")
                     continue
             except Exception as e:
+                logging.warning(f"Failed to add ssh keys on {vm.ip}:{vm.port}")
                 continue
             res.started = True
 
