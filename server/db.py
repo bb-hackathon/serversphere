@@ -1,4 +1,4 @@
-CREATE_TABLE_USERS="""--sql
+CREATE_TABLE_USERS = """--sql
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     login TEXT NOT NULL UNIQUE,
@@ -17,7 +17,19 @@ CREATE TABLE IF NOT EXISTS desktops (
     ip TEXT NOT NULL,
     port INTEGER NOT NULL
 )
+"""
 
+CREATE_TABLE_RESERVATION = """--sql
+CREATE TABLE IF NOT EXISTS reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reservedDesktop INTEGER,
+    reservedFrom INTEGER,
+    reservedUntil INTEGER,
+    reservedBy INTEGER,
+    FOREIGN KEY(reservedBy) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(reservedDesktop) REFERENCES desktops(id) ON DELETE CASCADE
+
+)
 
 """
 
