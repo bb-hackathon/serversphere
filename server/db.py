@@ -20,3 +20,7 @@ CREATE TABLE IF NOT EXISTS desktops (
 
 
 """
+
+INIT_ADMIN = """--sql
+INSERT INTO users(login, password, isAdmin, sshKey) VALUES(?,?,?,?)
+"""

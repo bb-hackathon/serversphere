@@ -1,14 +1,14 @@
 from sqlite3 import connect
 from fastapi import FastAPI
 import uvicorn
-from users.infra.dto.user import UserCreateDTO
+from users.infra.dto.user import UserCreateDTO, hash_password
 from users.infra.exceptions import UserAlreadyExists
 from users.infra.sql_queries import CREATE_NEW_USER
 from users.infra.user_repo import UserRepo
 from users.rest.exc_handling import handlers
 from users.rest.rest import user_router
 from users.rest.admin import admin_router
-from db import CREATE_TABLE_DESKTOPS, CREATE_TABLE_USERS
+from db import CREATE_TABLE_DESKTOPS, CREATE_TABLE_USERS, INIT_ADMIN
 from fastapi.middleware.cors import CORSMiddleware
 
 def init():
@@ -30,12 +30,11 @@ def startapp():
     with connect('db.sqlite') as conn:
         conn.execute(CREATE_TABLE_USERS)
         conn.execute(CREATE_TABLE_DESKTOPS)
-        conn.commit()
         try:
-            usr_repo = UserRepo(cursor=conn.cursor())
-            usr_repo.register_new_user(UserCreateDTO(login="admin", sshKey="Blank",isAdmin=1, password="admin"))
-        except UserAlreadyExists:
-            print("Skipping pre-init...")
+            conn.execute(INIT_ADMIN, ("admin", hash_password("admin"), 1, "Blank"))
+        except:
+            print("skipping init...")
+        conn.commit()
         conn.commit()
     uvicorn.run(init(), host='127.0.0.1', port=8000)
 
