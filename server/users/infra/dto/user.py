@@ -5,14 +5,15 @@ import bcrypt
 class BaseUser(BaseModel):
     login: str
     sshKey: str
-    isAdmin: bool
+    
     
 class UserReadDTO(BaseUser, BaseEntity):
-    pass
+    isAdmin: bool
     
     
 class UserAuthDTO(BaseUser, BaseEntity):
     password: str
+    isAdmin: bool
     
 
 class UserCreateDTO(BaseUser):
