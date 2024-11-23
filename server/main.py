@@ -31,7 +31,7 @@ def startapp():
         except UserAlreadyExists:
             print("Skipping pre-init...")
         conn.commit()
-    uvicorn.run(init())
+    uvicorn.run(init(),host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
     startapp()
