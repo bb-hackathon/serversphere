@@ -6,8 +6,8 @@ from common.dto.entity import BaseEntity
 
 
 class DesktopType(Enum):
-    VM="Vm",
-    Hard="Hard",
+    VM="Vm"
+    Hard="Hard"
     Cloud="Cloud"
 
 

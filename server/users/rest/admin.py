@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 
+from desktops.infra.desktop_repo import DesktopRepo
 from desktops.infra.dto.desktops import DesktopCreateDTO
 from users.infra.dependency import get_cursor
-from users.infra.exceptions import NotAdmin
+from users.infra.exceptions import DesktopAlreadyExists, NotAdmin
 from users.infra.user_repo import UserRepo
 from users.rest.tokens import detokenize
+from starlette import status
 
 def check_admin_rights(request: Request, cur = Depends(get_cursor)):
     cookie = request.cookies.get('user')
@@ -38,6 +40,14 @@ def users(cur = Depends(get_cursor)):
 
 @admin_router.post('/register_desktop')
 def register_desktop(desktop: DesktopCreateDTO,cur = Depends(get_cursor)):
-    pass
+    dsk_repo = DesktopRepo(cur)
+    try:
+        dsk_repo.create_new_desktop(desktop)
+    except DesktopAlreadyExists as e:
+        return Response(e.message, status_code=status.HTTP_409_CONFLICT)
+    
+    return Response("Created", status_code=status.HTTP_201_CREATED)
+
+
 
 
