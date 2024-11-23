@@ -1,11 +1,11 @@
 [package]
 name = "serversphere-agent"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 authors = ["mxxntype <59417007+mxxntype@users.noreply.github.com>"]
 
 [package.metadata.deb]
-maintainer-scripts = "debian/"
+maintainer-scripts = "systemd/"
 systemd-units = [{ unit-name = "serversphere-agent", enable = true }]
 
 [[bin]]
