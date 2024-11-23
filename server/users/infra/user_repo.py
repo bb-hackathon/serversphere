@@ -3,7 +3,7 @@ from typing import Optional
 
 from users.infra.dto.user import UserAuthDTO, UserCreateDTO, UserReadDTO, check_password, hash_password
 from users.infra.exceptions import UserAlreadyExists
-from users.infra.sql_queries import CREATE_NEW_USER, GET_USER_BY_ID, GET_USER_BY_LOGIN, REVERT_ADMIN
+from users.infra.sql_queries import CREATE_NEW_USER, GET_USER_BY_ID, GET_USER_BY_LOGIN, GET_USERS, REVERT_ADMIN
 
 
 class UserRepo:
@@ -38,3 +38,10 @@ class UserRepo:
         is_admin = user.isAdmin
         self.__cursor.execute(REVERT_ADMIN, (not is_admin, login))
         self.__cursor.connection.commit()
+
+
+    def get_users(self) -> list[UserReadDTO]:
+        self.__cursor.execute(GET_USERS)
+        res = self.__cursor.fetchall()
+        return list(map(lambda row: UserReadDTO(**row), res))
+    

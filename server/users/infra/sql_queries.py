@@ -14,3 +14,7 @@ SELECT id, login, password, isAdmin, sshKey FROM users WHERE login = ?
 REVERT_ADMIN = """--sql
 UPDATE users SET isAdmin = ? WHERE login = ?
 """
+
+GET_USERS = """--sql
+SELECT id, login, isAdmin, sshKey FROM users
+"""

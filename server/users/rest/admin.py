@@ -26,6 +26,14 @@ admin_router = APIRouter(prefix="/admin", dependencies=[Depends(check_admin_righ
 def give_admin(request:Request, login: str, cur = Depends(get_cursor)):
     usr_repo = UserRepo(cur)
     usr_repo.invert_admin(login)
-    
+
+
+
+@admin_router.get('/users')
+def users(cur = Depends(get_cursor)):
+    usr_repo = UserRepo(cur)
+    return usr_repo.get_users()
+
+
 
 
