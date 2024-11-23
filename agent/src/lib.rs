@@ -18,15 +18,17 @@ pub const PORT: u16 = 8000;
 #[instrument(name = "agent_main")]
 pub async fn run_agent() -> Result<(), crate::Error> {
     let router = Router::new()
-        .route("/status", get(health_check))
         .route("/metrics", get(commands::metrics))
+        .route("/reboot", post(commands::reboot))
         .route("/restart/sshd", post(commands::restart_sshd))
-        .route("/reboot", post(commands::reboot));
+        .route("/restart/vnc", post(commands::restart_vnc))
+        .route("/status", get(health_check));
+    let router = Router::new().nest("/serversphere/agent", router);
 
     let addr = (Ipv4Addr::UNSPECIFIED, PORT);
-    tracing::info!(message = "setting up listener", ?addr);
+    tracing::info!(message = "setting up tcp listener", ?addr);
     let listener = TcpListener::bind(addr).await?;
-    tracing::info!(message = "starting axum listener");
+    tracing::info!(message = "starting axum webserver");
     axum::serve(listener, router).await?;
 
     Ok(())

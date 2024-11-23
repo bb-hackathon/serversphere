@@ -58,6 +58,14 @@ pub async fn restart_sshd() -> Result<&'static str, StatusCode> {
     Ok("sshd restared. all ssh sessions should be closed by now")
 }
 
+#[axum::debug_handler]
+#[instrument]
+pub async fn restart_vnc() -> Result<&'static str, StatusCode> {
+    tracing::debug!(message = "vnc restart requested");
+    restart_helper("vnc", None)?;
+    Ok("vnc restared. all vnc sessions should be closed by now")
+}
+
 #[instrument]
 fn restart_helper(
     process_name: &'static str,
