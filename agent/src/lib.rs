@@ -13,7 +13,7 @@ use std::net::Ipv4Addr;
 use tokio::net::TcpListener;
 use tracing::instrument;
 
-pub const PORT: u16 = 8000;
+pub const PORT: u16 = 8002;
 
 #[instrument(name = "agent_main")]
 pub async fn run_agent() -> Result<(), crate::Error> {
