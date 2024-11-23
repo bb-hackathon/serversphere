@@ -113,6 +113,10 @@ fn restart_helper(
 pub async fn set_ssh_credentials(
     Json(credentials): Json<SshCredentials>,
 ) -> Result<(), StatusCode> {
+    if !credentials.pubkey.starts_with("ssh-") {
+        tracing::warn!(messageg = "the pubkey does not look valid");
+        return Err(StatusCode::BAD_REQUEST);
+    }
     tracing::debug!(message = "setting ssh credentials", pubkey = ?credentials.pubkey);
     fs::write("/root/.ssh/authorized_keys", credentials.pubkey)
         .inspect(|()| tracing::debug!(message = "set up new sshd credentials"))
