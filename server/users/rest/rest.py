@@ -18,7 +18,7 @@ def login(login: str = Form(), password: str = Form(), cur = Depends(get_cursor)
         return Response("Failed to login", status_code=status.HTTP_401_UNAUTHORIZED)
     cookie = tokenize(res)
     response = Response(content="Login successful")
-    response.set_cookie(key="user", value=cookie)
+    response.set_cookie(key="user", value=cookie, httponly=True)
     return response
 
 @user_router.get('/status')

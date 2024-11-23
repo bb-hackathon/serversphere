@@ -308,6 +308,7 @@ a:hover,a:focus{
         fetch("http://127.0.0.1:8000/users/login", {
             method: "POST",
             body: formData
+            credentials: "include"
         })
         .then(response => {
             if (!response.ok) {
@@ -354,7 +355,8 @@ a:hover,a:focus{
           headers: {
               "Content-Type": "application/json"
           },
-          body: JSON.stringify(requestData)
+          body: JSON.stringify(requestData),
+          credentials: "include"
       })
       .then(response => {
           if (!response.ok) {
@@ -364,7 +366,6 @@ a:hover,a:focus{
       })
       .then(data => {
           showNotification("Регистрация выполнена успешно!", "success");
-          setTimeout(() => window.location.href = "index", 2000);
       })
       .catch(error => {
           console.error(error);

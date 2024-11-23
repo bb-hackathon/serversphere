@@ -15,7 +15,13 @@ def init():
     app = FastAPI()
     app.include_router(user_router)
     app.include_router(admin_router)
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    app.add_middleware(
+  CORSMiddleware,
+        allow_origins=['http://127.0.0.1:8001'],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "OPTIONS"], # include additional methods as per the application demand
+        allow_headers=["Content-Type","Set-Cookie"], # include additional headers as per the application demand
+)
     handlers(app)
     return app
 
@@ -31,7 +37,7 @@ def startapp():
         except UserAlreadyExists:
             print("Skipping pre-init...")
         conn.commit()
-    uvicorn.run(init(),host="0.0.0.0", port=8000)
+    uvicorn.run(init(), host='127.0.0.1', port=8000)
 
 if __name__ == "__main__":
     startapp()
