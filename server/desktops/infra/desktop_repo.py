@@ -16,11 +16,13 @@ from desktops.infra.sql_queries import (
     CREATE_NEW_DESKTOP,
     DELETE_DESKTOP,
     DELETE_RESERVATION,
+    GET_DESKTOP_BY_ID,
     GET_DESKTOP_BY_NAME,
     GET_DESKTOPS,
     GET_RESERVATIONS,
     GET_RESERVATIONS_ON_DESKTOP,
     SET_RESERVATION,
+    START_RESERVATION,
     UPDATE_STATUS,
 )
 from users.infra.exceptions import DesktopAlreadyExists
@@ -43,6 +45,11 @@ class DesktopRepo:
 
     def get_desktop_by_name(self, name: str) -> Optional[DesktopReadDTO]:
         self.__cursor.execute(GET_DESKTOP_BY_NAME, (name,))
+        res = self.__cursor.fetchone()
+        return DesktopReadDTO(**res) if res else None
+    
+    def get_desktop_by_id(self, id: int) -> Optional[DesktopReadDTO]:
+        self.__cursor.execute(GET_DESKTOP_BY_ID, (id,))
         res = self.__cursor.fetchone()
         return DesktopReadDTO(**res) if res else None
 
@@ -133,3 +140,7 @@ class DesktopRepo:
                 ).json()
             )
         )
+
+    def start_reservation(self, id: int):
+        self.__cursor.execute(START_RESERVATION, (id,))
+        self.__cursor.connection.commit()

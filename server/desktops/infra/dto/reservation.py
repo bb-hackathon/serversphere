@@ -7,6 +7,7 @@ class ReservationDTO(BaseEntity):
     reservedUntil: str
     reservedBy: int
     reservedDesktop: int
+    started: bool
 
 
 class ReservationTimeDTO(BaseEntity):

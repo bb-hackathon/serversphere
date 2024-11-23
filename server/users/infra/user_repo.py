@@ -35,7 +35,7 @@ class UserRepo:
                 raise UserAlreadyExists(user.login)
 
     def get_user_by_id(self, id: int) -> Optional[UserReadDTO]:
-        self.__cursor.execute(GET_USER_BY_ID, id)
+        self.__cursor.execute(GET_USER_BY_ID, (id,))
         res = self.__cursor.fetchone()
         return UserReadDTO(**res) if res else None
 

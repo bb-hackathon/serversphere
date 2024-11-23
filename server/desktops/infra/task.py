@@ -6,12 +6,14 @@ from requests import request
 from desktops.infra.desktop_repo import DesktopRepo
 from desktops.infra.dto.reservation import ReservationDTO
 from users.infra.dependency import get_cursor
+from users.infra.user_repo import UserRepo
 
 
 def check_for_reservations():
     gen = get_cursor()
     cur = gen.__next__()
     dsk_repo = DesktopRepo(cur)
+    usr_repo = UserRepo(cur)
     ress = dsk_repo.get_reservations()
     for res in ress:
         res = ReservationDTO(**res)
@@ -20,7 +22,34 @@ def check_for_reservations():
             < datetime.datetime.now().timestamp()
         ):
             dsk_repo.delete_reservation(res.id)
+
+        if (
+            datetime.datetime.fromisoformat(res.reservedFrom).timestamp()
+            < datetime.datetime.now().timestamp() and not res.started 
+        ):
+            vm = dsk_repo.get_desktop_by_id(res.reservedDesktop)
+            user = usr_repo.get_user_by_id(res.reservedBy)
+            if not vm:
+                continue
+            if not vm.isAlive:
+                continue
+            if not user:
+                continue
+            if not user.sshKey:
+                continue
+            try:
+                req = request("POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/credentials/sshd", json={"pubkey": user.sshKey}, timeout=1)
+                if req.status_code == 400:
+                    continue
+            except Exception as e:
+                continue
+            res.started = True
+
     res = dsk_repo.get()
+
+
+
+
     for vm in res:
         try:
             res = request(

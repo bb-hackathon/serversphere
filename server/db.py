@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservedFrom INTEGER,
     reservedUntil INTEGER,
     reservedBy INTEGER,
+    started INTEGER DEFAULT 0,
     FOREIGN KEY(reservedBy) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(reservedDesktop) REFERENCES desktops(id) ON DELETE CASCADE
 
