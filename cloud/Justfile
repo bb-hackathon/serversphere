@@ -8,4 +8,4 @@ list:
     multipass list --format json | from json | get list | reject release
 
 new NAME:
-    multipass launch {{LABEL}} --name {{NAME}} --cloud-init user-data.yml
+    multipass launch {{LABEL}} --name {{NAME}} --cloud-init user-data.yml --cpus 2 --memory 2G --disk 20G

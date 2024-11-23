@@ -5,16 +5,33 @@ chpasswd:
 
 users:
 - name: default
-  plain_text_passwd: 12345
+  plain_text_passwd: "12345"
 
 allow_public_ssh_keys: true
 disable_root: false
 disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
 ssh_authorized_keys: [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvBw3klXzVq5oTXtS061cfcGEjHWflPZNRBRg48N3w/ astrumaureus@Nox" ]
 
+package_update: true
+package_upgrade: true
+packages:
+- apt: [xfce4, xfce4-goodies, tightvncserver]
+
 runcmd:
   - |
     wget "https://github.com/bb-hackathon/serversphere/releases/download/v1.0.0/serversphere-agent_1.0.0-1_amd64.deb" -O /tmp/agent.deb
     sudo dpkg --install /tmp/agent.deb
     sudo apt-get install -f
+
+    # sudo apt install xfce4 xfce4-goodies tightvncserver
+    # echo -e "12345678\n12345678\nn\n" | vncserver
+    # vncserver -kill :1
+
+    # cat << EOF > ~/.vnc/xstartup
+    # #!/bin/bash
+    # xrdb $HOME/.Xresources
+    # startxfce4 &
+    # EOF
+
+    # chmod +x ~/.vnc/xstartup
 
