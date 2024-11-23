@@ -12,8 +12,9 @@ fn setup_tracing() -> Result<(), eyre::Report> {
     use tracing_error::ErrorLayer;
     use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
-    let filter_layer = EnvFilter::try_from_default_env().or_else(|_| EnvFilter::try_new("info"))?;
     let format_layer = fmt::layer().without_time().with_target(false);
+    let filter_layer =
+        EnvFilter::try_from_default_env().or_else(|_| EnvFilter::try_new("trace"))?;
 
     tracing_subscriber::registry()
         .with(filter_layer)
