@@ -12,6 +12,7 @@ pkgs.mkShell rec {
         sqlite
         cloud-init
         multipass
+        poetry
     ];
 
     LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
