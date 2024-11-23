@@ -36,3 +36,8 @@ def reserve(
 def get_reservations(request:Request, name:str, _=Depends(get_user_id), cur=Depends(get_cursor)):
     dsk_repo = DesktopRepo(cur)
     return list(map(lambda x: ReservationTimeDTO(**x), dsk_repo.get_reservations()))
+
+@desktop_router.get("/fetch_desktops")
+def get_reservations(request:Request, cur=Depends(get_cursor)):
+    dsk_repo = DesktopRepo(cur)
+    return dsk_repo.get_multipass_vm()

@@ -1,5 +1,8 @@
 import datetime
+import json
+import os
 from sqlite3 import Cursor, IntegrityError
+import subprocess
 from typing import Optional
 
 from common.exceptions import EntityNotFound
@@ -82,3 +85,10 @@ class DesktopRepo:
     def delete_reservation(self, id):
         self.__cursor.execute(DELETE_RESERVATION, (id,))
         self.__cursor.connection.commit()
+
+
+    def get_multipass_vm():
+        res = subprocess.check_output(['multipass', '--list'])
+        json.loads(res)
+        print(res)
+        return res
