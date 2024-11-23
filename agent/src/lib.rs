@@ -23,7 +23,7 @@ pub async fn run_agent() -> Result<(), crate::Error> {
         .route("/reboot", post(commands::reboot))
         .route("/restart/sshd", post(commands::restart_sshd))
         .route("/restart/vnc", post(commands::restart_vnc))
-        .route("/revoke_access", get(commands::revoke_access))
+        .route("/revoke_access", post(commands::revoke_access))
         .route("/status", get(health_check));
     let router = Router::new().nest("/serversphere/agent", router);
 
