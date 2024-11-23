@@ -16,6 +16,10 @@ def index():
 def list():
     return render_template('index.html')
 
+@app.route('/client')
+def client():
+    return render_template('client.html')
+
 @app.route('/charts')
 def charts():
     vm_name = request.args.get('vm', 'Unknown VM')

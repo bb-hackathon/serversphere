@@ -11,14 +11,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <div class="notifications"></div>
 
     <div class="container text-center">
         <h1 class="animate__animated animate__fadeInDown">Толстый указатель</h1>
     
         <div id="vm-list">
-            <h2 class="mt-4">Панель Администратора. Доступные устройства</h2>
-            <button id="add-btn" class="btn btn-primary btn-lg mt-3 mb-3 ms-3">Добавить новое устройство</button>
+            <h2 class="mt-4">Панель Администратора</h2>
+            <div id="user-info" class="user-info-container text-end me-3 mt-3"></div>
+            <div class="d-flex justify-content-center">
+                <button id="add-btn" class="btn btn-primary btn-lg mt-3 mb-3 ms-3">Добавить новое устройство</button>
+                <button id="logout-btn" class="btn btn-danger btn-lg mt-3 mb-3 ms-3">Выйти</button>
+            </div>
+            <div id="add-form" class="mt-4 animate__animated animate__fadeIn" style="display: none;">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h3 class="card-title">Добавление</h3>
+                        <div class="mb-3">
+                            <label for="vm-name" class="form-label">Наименование</label>
+                            <input type="text" class="form-control" id="vm-name" name="vm-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vm-ip" class="form-label">IP адрес</label>
+                            <input type="text" class="form-control" id="vm-ip" name="vm-ip" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vm-port" class="form-label">Порт для подключения</label>
+                            <input type="text" class="form-control" id="vm-port" name="vm-port" required>
+                        </div>
+                        <button type="button" id="save-btn" class="btn btn-success">Сохранить</button>
+                        <button type="button" id="cancel-btn" class="btn btn-danger">Отменить</button>
+                    </div>
+                </div>
+            </div>
             <table class="table table-hover table-bordered mt-3">
                 <thead class="table-dark">
                     <tr>
@@ -47,28 +73,6 @@
             <tbody id="user-table-body">
             </tbody>
         </table>
-    
-        <div id="add-form" class="mt-4 animate__animated animate__fadeIn" style="display: none;">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h3 class="card-title">Добавление</h3>
-                    <div class="mb-3">
-                        <label for="vm-name" class="form-label">Наименование</label>
-                        <input type="text" class="form-control" id="vm-name" name="vm-name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="vm-ip" class="form-label">IP адрес</label>
-                        <input type="text" class="form-control" id="vm-ip" name="vm-ip" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="vm-port" class="form-label">Порт для подключения</label>
-                        <input type="text" class="form-control" id="vm-port" name="vm-port" required>
-                    </div>
-                    <button type="button" id="save-btn" class="btn btn-success">Сохранить</button>
-                    <button type="button" id="cancel-btn" class="btn btn-danger">Отменить</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div id="modal" style="display: none; position: fixed; top: 10%; left: 10%; width: 80%; height: 80%; background-color: white; border: 1px solid #ddd; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); resize: both; overflow: hidden;">

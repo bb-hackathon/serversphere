@@ -1,7 +1,8 @@
-//TODO: fix user login status
 const vmList = [
     { name: "Ubuntu Linux", ip: "93.183.82.91", port: "5901" }
 ];
+
+let currentUserLogin = "";
 const connectionStatus = {};
 
 const vmTableBody = document.getElementById("vm-table-body");
@@ -24,7 +25,7 @@ function showNotification(message, type) {
 }
 
 function fetchUsers() {
-    fetch("http://127.0.0.1:8000/admin/users",{credentials: "include"})
+    fetch("http://127.0.0.1:8000/admin/users", { credentials: "include" })
         .then(response => {
             if (!response.ok) {
                 throw new Error("Не удалось загрузить пользователей");
@@ -36,6 +37,8 @@ function fetchUsers() {
             userTableBody.innerHTML = "";
 
             users.forEach(user => {
+                const isCurrentUser = user.login === currentUserLogin; 
+                
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${user.id}</td>
@@ -44,8 +47,20 @@ function fetchUsers() {
                     <td>
                         ${
                             user.isAdmin
-                                ? `<span class="badge bg-success">Администратор</span>`
-                                : `<button class="btn btn-danger btn-sm" onclick="makeAdmin('${user.login}')">Сделать администратором</button>`
+                                ? isCurrentUser
+                                    ? `<span class="badge bg-success">Администратор</span>`
+                                    : `
+                                        <span class="badge bg-success">Администратор</span>
+                                        <button class="btn btn-warning btn-sm" onclick="makeAdmin('${user.login}')">Обжаловать</button>
+                                      ` 
+                                : isCurrentUser
+                                    ? "" 
+                                    : `<button class="btn btn-danger btn-sm" onclick="makeAdmin('${user.login}')">Сделать администратором</button>`
+                        }
+                        ${
+                            isCurrentUser
+                                ? "" 
+                                : `<button class="btn btn-danger btn-sm" onclick="deleteUser('${user.login}')">Удалить</button>`
                         }
                     </td>
                 `;
@@ -57,6 +72,7 @@ function fetchUsers() {
             showNotification("Не удалось загрузить список пользователей.", "error");
         });
 }
+
 
 function makeAdmin(login) {
     const url = `http://127.0.0.1:8000/admin/give_admin?login=${encodeURIComponent(login)}`;
@@ -81,16 +97,107 @@ function makeAdmin(login) {
     });
 }
 
+function deleteUser(login) {
+    const url = `http://127.0.0.1:8000/users/?login=${encodeURIComponent(login)}`;
+    
+    fetch(url, {
+        method: "DELETE",
+        credentials: "include"
+    })
+    .then(response => {
+        if (!response.ok) {
+            showNotification(`Ошибка: ${data.message}`, "error");
+            throw new Error("Ошибка при удалении пользователя");
+        } else {
+            showNotification(`Пользователь "${login}" успешно удалён`, "success");
+            fetchUsers(); 
+        }
+        return response;
+    })
+    .catch(error => {
+        console.error("Ошибка удаления пользователя:", error);
+        showNotification("Не удалось удалить пользователя.", "error");
+    });
+}
+
+function logoutUser() {
+    fetch("http://127.0.0.1:8000/users/logout", {
+        method: "POST",
+        credentials: "include"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Ошибка выхода");
+        } else {
+            showNotification("Вы успешно вышли из системы.", "success");
+        }
+        return response;
+    })
+    .then(() => {
+        window.location.href = "/";
+    })
+    .catch(error => {
+        console.error("Ошибка выхода:", error);
+        showNotification("Не удалось выйти из системы.", "error");
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    fetchUsers();
+    checkUserStatus();
 });
+
+function checkUserStatus() {
+    fetch("http://127.0.0.1:8000/users/status", {
+        credentials: "include"
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to fetch user status");
+        }
+        return response.json();
+    })
+    .then(userStatus => {
+        const isAdmin = userStatus.isAdmin;
+        const { id, login: name, sshKey } = userStatus;
+
+        currentUserLogin = name;
+
+        const userInfo = document.getElementById("user-info");
+        userInfo.innerHTML = `
+            <div class="card shadow-sm p-3 bg-light rounded">
+                <div class="card-body">
+                    <h5 class="card-title">Здравствуйте, <strong>${name}</strong>!</h5>
+                    <p class="card-text mb-1"><small class="text-muted">ID: ${id}</small></p>
+                    <p class="card-text"><small class="text-muted">SSH Key:</small><br><code>${sshKey}</code></p>
+                </div>
+            </div>
+        `;
+
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", logoutUser);
+        }
+
+        if (isAdmin) {
+            console.log("Пользователь является администратором. Загружаем панель администратора...");
+            fetchUsers();
+        } else {
+            console.log("Пользователь не является администратором. Загружаем клиентскую страницу...");
+            window.location.href = "/client";
+        }
+    })
+    .catch(error => {
+        console.error("Ошибка проверки статуса пользователя:", error);
+        window.location.href = "/";
+    });
+}
 
 function openChartsPage(vmName) {
     window.location.href = `/charts?vm=${encodeURIComponent(vmName)}`;
 }
 
 function openBookVM(index) {
-    const vmName = vmList[index].name; 
+    const vmName = vmList[index].name; D
     showBookingModal(vmName);
 }
 

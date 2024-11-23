@@ -184,3 +184,25 @@ a:hover, a:focus {
     border-radius: 20px;
     text-transform: uppercase;
 }
+
+.user-info-container .card {
+    max-width: 300px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-info-container .card-title {
+    font-size: 18px;
+    color: #333;
+}
+
+.user-info-container code {
+    font-size: 12px;
+    word-wrap: break-word;
+    color: #6c757d;
+}
+
+#logout-btn {
+    display: block;
+}
