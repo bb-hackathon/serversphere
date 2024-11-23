@@ -22,4 +22,12 @@ class NotAdmin(Exception):
 
     @property
     def message(self):
-        return f"Unauthorized access"
+        return f"Unauthorized access: Not an admin"
+    
+class NotAuthorized(Exception):
+    def __init__(self):
+        pass
+
+    @property
+    def message(self):
+        return f"Unauthorized access: Not authorized"

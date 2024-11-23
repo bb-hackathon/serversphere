@@ -1,7 +1,7 @@
 from sqlite3 import Cursor, IntegrityError
 
-from desktops.infra.dto.desktops import DesktopCreateDTO
-from desktops.infra.sql_queries import CREATE_NEW_DESKTOP
+from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO
+from desktops.infra.sql_queries import CREATE_NEW_DESKTOP, GET_DESKTOPS
 from users.infra.exceptions import DesktopAlreadyExists
 
 
@@ -16,3 +16,7 @@ class DesktopRepo:
         except IntegrityError as e:
             if "UNIQUE" in str(e):
                 raise DesktopAlreadyExists(desktop.name)
+            
+    def get(self):
+        self.__cursor.execute(GET_DESKTOPS)
+        return list(map(lambda row: DesktopReadDTO(**row), self.__cursor.fetchall()))

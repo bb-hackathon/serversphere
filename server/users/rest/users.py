@@ -46,3 +46,4 @@ def register(user: UserCreateDTO, cur = Depends(get_cursor)):
     return Response("Created", status.HTTP_201_CREATED)
 
 
+
