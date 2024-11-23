@@ -3,6 +3,10 @@ password: "12345"
 chpasswd:
   expire: False
 
+users:
+- name: default
+  plain_text_passwd: 12345
+
 allow_public_ssh_keys: true
 disable_root: false
 disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
