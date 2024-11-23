@@ -88,7 +88,7 @@ class DesktopRepo:
 
 
     def get_multipass_vm(self):
-        res = subprocess.check_output(['multipass', '--list'])
+        res = subprocess.check_output(['multipass', 'list', '--format', 'json'])
         json.loads(res)
         print(res)
         return res
