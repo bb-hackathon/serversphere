@@ -1,5 +1,7 @@
+from ast import excepthandler
 import datetime
 from fastapi import Depends
+from requests import request
 
 from desktops.infra.desktop_repo import DesktopRepo
 from desktops.infra.dto.reservation import ReservationDTO
@@ -17,8 +19,19 @@ def check_for_reservations():
             datetime.datetime.fromisoformat(res.reservedUntil).timestamp()
             < datetime.datetime.now().timestamp()
         ):
-            print(f"вот хуила протухшая: {res.reservedDesktop}")
+            
             dsk_repo.delete_reservation(res.id)
+    print(1)
+    res = dsk_repo.get()
+    for vm in res:
+        try:
+            res = request("GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics", timeout=1)
+            print(res.content)
+        except:
+            print("fail")
+        
+
+
 
     try:
         gen.__next__()

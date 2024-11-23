@@ -49,3 +49,10 @@ def register(user: UserCreateDTO, cur=Depends(get_cursor)):
         return Response(content=e.message, status_code=status.HTTP_409_CONFLICT)
 
     return Response("Created", status.HTTP_201_CREATED)
+
+
+
+@user_router.delete("/")
+def delete_user(login: str, cur=Depends(get_cursor)):
+    user_repo = UserRepo(cur)
+    user_repo.delete_user(login)

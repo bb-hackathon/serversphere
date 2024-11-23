@@ -11,6 +11,7 @@ from users.infra.dto.user import (
 from users.infra.exceptions import UserAlreadyExists
 from users.infra.sql_queries import (
     CREATE_NEW_USER,
+    DELETE_USER,
     GET_USER_BY_ID,
     GET_USER_BY_LOGIN,
     GET_USERS,
@@ -63,3 +64,9 @@ class UserRepo:
         self.__cursor.execute(GET_USERS)
         res = self.__cursor.fetchall()
         return list(map(lambda row: UserReadDTO(**row), res))
+
+
+    def delete_user(self, name):
+        self.__cursor.execute(DELETE_USER, (name,))
+        self.__cursor.connection.commit()
+        

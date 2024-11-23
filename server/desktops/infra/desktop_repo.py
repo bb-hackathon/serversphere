@@ -86,6 +86,10 @@ class DesktopRepo:
         self.__cursor.execute(DELETE_RESERVATION, (id,))
         self.__cursor.connection.commit()
 
+    def delete_vm(self, name):
+        self.__cursor.execute(DELETE_RESERVATION, (name,))
+        self.__cursor.connection.commit()
+
 
     def get_multipass_vm(self):
         try:

@@ -31,3 +31,7 @@ SELECT id, reservedFrom, reservedBy, reservedDesktop, reservedUntil FROM reserva
 DELETE_RESERVATION = """--sql
 DELETE FROM reservations WHERE id = ?
 """
+
+DELETE_RESERVATION = """--sql
+DELETE FROM desktops WHERE name = ?
+"""

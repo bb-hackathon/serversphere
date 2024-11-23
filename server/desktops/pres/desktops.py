@@ -41,3 +41,9 @@ def get_reservations(request:Request, name:str, _=Depends(get_user_id), cur=Depe
 def get_reservations(request:Request, cur=Depends(get_cursor)):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.get_multipass_vm()
+
+
+@desktop_router.delete("/")
+def delete_desktop(request: Request, name: str, cur = Depends(get_cursor)):
+    dsk_repo = DesktopRepo(cur)
+    return dsk_repo.delete_vm(name)
