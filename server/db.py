@@ -33,6 +33,8 @@ CREATE TABLE IF NOT EXISTS reservations (
 
 """
 
+
+
 INIT_ADMIN = """--sql
 INSERT INTO users(login, password, isAdmin, sshKey) VALUES(?,?,?,?)
 """

@@ -6,6 +6,8 @@ from desktops.infra.dto.reservation import ReservationTimeDTO
 from users.infra.dependency import get_cursor, get_user_id
 from starlette import status
 
+from users.rest.admin import check_admin_rights
+
 
 desktop_router = APIRouter(prefix="/desktops")
 
@@ -44,6 +46,6 @@ def get_reservations(request:Request, cur=Depends(get_cursor)):
 
 
 @desktop_router.delete("/")
-def delete_desktop(request: Request, name: str, cur = Depends(get_cursor)):
+def delete_desktop(request: Request, name: str, cur = Depends(get_cursor), _ = Depends(check_admin_rights)):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.delete_vm(name)

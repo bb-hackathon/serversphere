@@ -5,6 +5,7 @@ from users.infra.dependency import get_cursor, get_user_id
 from users.infra.dto.user import UserAuthDTO, UserCreateDTO
 from users.infra.exceptions import UserAlreadyExists
 from users.infra.user_repo import UserRepo
+from users.rest.admin import check_admin_rights
 from users.rest.tokens import detokenize, tokenize
 from starlette import status
 
@@ -53,7 +54,7 @@ def register(user: UserCreateDTO, cur=Depends(get_cursor)):
 
 
 @user_router.delete("/")
-def delete_user(login: str, cur=Depends(get_cursor)):
+def delete_user(login: str, cur=Depends(get_cursor), _ = Depends(check_admin_rights)):
     user_repo = UserRepo(cur)
     user_repo.delete_user(login)
 
