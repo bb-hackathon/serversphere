@@ -8,8 +8,9 @@ pkgs.mkShell rec {
     nativeBuildInputs = with pkgs; [ pkg-config ];
     buildInputs = with pkgs; [
         openssl
-        sqlx-cli
+        python3
         sqlite
+        cloud-init
     ];
 
     LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
