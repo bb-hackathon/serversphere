@@ -24,7 +24,8 @@ def login(login: str = Form(), password: str = Form(), cur = Depends(get_cursor)
 @user_router.get('/status')
 def user_status(request: Request, cur = Depends(get_cursor)):
 
-    cookie = request.cookies.get("user")
+    cookie = request.cookies.get('user')
+    print(cookie)
     if not cookie:
         return Response("Failed to get user info", status_code=status.HTTP_400_BAD_REQUEST)
     try:

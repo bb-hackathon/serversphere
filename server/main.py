@@ -33,7 +33,7 @@ def startapp():
         conn.commit()
         try:
             usr_repo = UserRepo(cursor=conn.cursor())
-            usr_repo.register_new_user(UserCreateDTO(login="admin", sshKey="Blank",isAdmin=True, password="admin"))
+            usr_repo.register_new_user(UserCreateDTO(login="admin", sshKey="Blank",isAdmin=1, password="admin"))
         except UserAlreadyExists:
             print("Skipping pre-init...")
         conn.commit()
