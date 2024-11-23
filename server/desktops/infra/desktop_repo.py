@@ -7,7 +7,7 @@ from typing import Optional
 
 from common.exceptions import EntityNotFound
 from desktops.exceptions import AlreadyReserved, InvalidReservation
-from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO
+from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO, DesktopType
 from desktops.infra.dto.reservation import ReservationDTO, check_reservation
 from desktops.infra.sql_queries import (
     CREATE_NEW_DESKTOP,
@@ -88,7 +88,17 @@ class DesktopRepo:
 
 
     def get_multipass_vm(self):
-        res = subprocess.check_output(['multipass', 'list', '--format', 'json'])
-        json.loads(res)
-        print(res)
+        try:
+            res = subprocess.check_output(['multipass', 'list', '--format', 'json'])
+            json.loads(res)
+        except:
+            return None
+        ls = res["list"]
+        for obj in ls:
+            vm = DesktopCreateDTO(name=obj["name"], ip=obj["ipv4"][0], type=DesktopType.VM)
+            try:
+                self.create_new_desktop(vm)
+            except DesktopAlreadyExists:
+                pass
+
         return res
