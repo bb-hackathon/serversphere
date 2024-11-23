@@ -11,6 +11,7 @@ pkgs.mkShell rec {
         python3
         sqlite
         cloud-init
+        multipass
     ];
 
     LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
