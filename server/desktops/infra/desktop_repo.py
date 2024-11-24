@@ -134,14 +134,16 @@ class DesktopRepo:
             raise EntityNotFound
         if not vm.isAlive:
             raise VmIsDead(vm.name)
-
-        return MetricsDTO(
-            **(
-                request(
-                    "GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics"
-                ).json()
+        try:
+            return MetricsDTO(
+                **(
+                    request(
+                        "GET", f"http://{vm.ip}:{vm.port}/serversphere/agent/metrics"
+                    ).json()
+                )
             )
-        )
+        except:
+            raise VmIsDead(vm.name)
 
     def start_reservation(self, id: int):
         self.__cursor.execute(START_RESERVATION, (id,))
