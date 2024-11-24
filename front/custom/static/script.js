@@ -313,29 +313,44 @@ function renderVMList(vms) {
             <td>${vm.ip}</td>
             <td>${vm.port}</td>
             <td>
-            <span class="badge ${isConnected ? 'bg-success' : 'bg-secondary'}">
-            ${isConnected ? 'Онлайн' : 'Офлайн'}
-            </span>
+                <span class="badge ${isConnected ? 'bg-success' : 'bg-secondary'}">
+                    ${isConnected ? 'Онлайн' : 'Офлайн'}
+                </span>
             </td>
             <td>
-            <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, false)" class="btn btn-primary">Открыть в окне</button>
-            <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
-            ${isConnected
-                ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить текущую сессию</button>`
-                : ''
-            }
+                <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, false)" class="btn btn-primary">Открыть в окне</button>
+                <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
+                ${isConnected
+                    ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить текущую сессию</button>
+                       <button onclick="rebootVM('${vm.name}')" class="btn btn-warning">Перезагрузить устройство</button>`
+                    : ''
+                }
                 <button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
                 <button onclick="openBookVM('${vm.name}')" class="btn btn-success">Бронь</button>
-                <button onclick="rebootVM('${vm.name}')" class="btn btn-warning">Перезагрузить устройство</button>
                 <button onclick="deleteVM('${vm.name}')" class="btn btn-danger">Удалить</button>
-                </td>
-                `;
+            </td>
+        `;
         vmTableBody.appendChild(row);
     });
 }
 
-function rebootVM(name) {
-
+function rebootVM(vmName) {
+    fetch(`127.0.0.1:8000/desktops/reboot?name=${encodeURIComponent(vmName)}`, {
+        credentials: "include"
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Не удалось перезагрузить");
+            }
+            return response.json();
+        })
+        .then(data => {
+            showNotification(`"${vmName}" будет перезагружено`, "success");
+        })
+        .catch(error => {
+            console.error("Ошибка перезагрузки:", error);
+            showNotification("Не удалось перезагрузить. Устройство офлайн", "error");
+        });
 }
 
 
