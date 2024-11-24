@@ -121,6 +121,19 @@
             <div class="charts-title">Количество процессов</div>
             <canvas id="processesChart"></canvas>
         </div>
+        <div class="chart-container">
+            <div class="charts-title">Время работы процессов (секунды)</div>
+            <table id="uptimeTable" border="1" style="width: 100%; text-align: left;">
+                <thead>
+                    <tr>
+                        <th>Процесс</th>
+                        <th>Время работы (сек)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <footer>
@@ -257,46 +270,70 @@
         async function fetchData() {
             try {
                 const response = await fetch('http://127.0.0.1:8000/desktops/metrics?name={{vm_name}}', { credentials: "include" });
-
+        
                 if (!response.ok) {
                     throw new Error("Система недоступна");
                 }
-
+        
                 const dataFromServer = await response.json();
-
+        
                 const currentTime = cpuData.labels.length + 1;
-
+        
+                // Обновление данных графиков
                 cpuData.labels.push(currentTime);
                 cpuData.datasets[0].data.push(dataFromServer.cpu_usage);
-                
+        
                 memoryData.labels.push(currentTime);
                 memoryData.datasets[0].data.push(dataFromServer.ram_usage);
-
+        
                 processesData.labels.push(currentTime);
                 processesData.datasets[0].data.push(dataFromServer.process_count);
-
+        
                 if (cpuData.labels.length > 30) {
                     cpuData.labels.shift();
                     cpuData.datasets[0].data.shift();
                 }
-
+        
                 if (memoryData.labels.length > 30) {
                     memoryData.labels.shift();
                     memoryData.datasets[0].data.shift();
                 }
-
+        
                 if (processesData.labels.length > 30) {
                     processesData.labels.shift();
                     processesData.datasets[0].data.shift();
                 }
-
+        
                 cpuChart.update();
                 memoryChart.update();
                 processesChart.update();
+        
+                // Обновление таблицы
+                updateUptimeTable(dataFromServer.process_uptimes);
+        
             } catch (error) {
                 console.error("Ошибка при получении данных:", error);
                 displaySystemUnavailable();
             }
+        }
+        
+        function updateUptimeTable(processUptimes) {
+            const tableBody = document.querySelector("#uptimeTable tbody");
+            tableBody.innerHTML = ""; // Очистка старых данных
+        
+            Object.entries(processUptimes).forEach(([processName, uptime]) => {
+                const row = document.createElement("tr");
+        
+                const nameCell = document.createElement("td");
+                nameCell.textContent = processName;
+        
+                const uptimeCell = document.createElement("td");
+                uptimeCell.textContent = uptime;
+        
+                row.appendChild(nameCell);
+                row.appendChild(uptimeCell);
+                tableBody.appendChild(row);
+            });
         }
 
         function displaySystemUnavailable() {
