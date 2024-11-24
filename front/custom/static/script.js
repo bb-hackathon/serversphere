@@ -184,76 +184,111 @@ function checkUserStatus() {
             window.location.href = "/";
         });
 }
+
 function openChartsPage(vmName) {
     window.location.href = `/charts?vm=${encodeURIComponent(vmName)}`;
 }
-function openBookVM(index) {
-    const vmName = vmList[index].name;
-    showBookingModal(vmName);
+
+function openBookVM(vmName) {
+    fetchReservations(vmName);
 }
-function showBookingModal(vmName) {
+
+function fetchReservations(vmName) {
+    fetch(`http://127.0.0.1:8000/desktops/get_reservations?name=${encodeURIComponent(vmName)}`, {
+        credentials: "include"
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Не удалось загрузить бронирования");
+            }
+            return response.json();
+        })
+        .then(reservations => {
+            showBookingModal(vmName, reservations);
+        })
+        .catch(error => {
+            console.error("Ошибка загрузки бронирований:", error);
+            showNotification("Не удалось загрузить бронирования.", "error");
+        });
+}
+
+function showBookingModal(vmName, reservations) {
+    const reservationList = reservations.map(reservation => `
+        <li>
+            <strong>С:</strong> ${new Date(reservation.reservedFrom).toLocaleString()} 
+            <strong>До:</strong> ${new Date(reservation.reservedUntil).toLocaleString()}
+        </li>`).join("");
+
     const modalHtml = `
-<div class="modal" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title" id="bookingModalLabel">Бронирование для ${vmName}</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
-<div class="modal-body">
-<label for="startDatetime">Дата и время начала</label>
-<input type="datetime-local" id="startDatetime" class="form-control">
-<label for="endDatetime" class="mt-3">Дата и время окончания</label>
-<input type="datetime-local" id="endDatetime" class="form-control">
-</div>
-<div class="modal-footer">
-<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-<button type="button" class="btn btn-primary" onclick="bookVM('${vmName}')">Забронировать</button>
-</div>
-</div>
-</div>
-</div>
-`;
+        <div class="modal" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingModalLabel">Бронирование для ${vmName}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Бронирования:</strong></p>
+                        <ul>${reservationList || "<li>Нет текущих бронирований</li>"}</ul>
+                        <hr>
+                        <label for="startDatetime">Дата и время начала</label>
+                        <input type="datetime-local" id="startDatetime" class="form-control">
+                        <label for="endDatetime" class="mt-3">Дата и время окончания</label>
+                        <input type="datetime-local" id="endDatetime" class="form-control">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" onclick="bookVM('${vmName}')">Забронировать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+
     const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
     bookingModal.show();
+
+    bookingModal._element.addEventListener('hidden.bs.modal', () => {
+        bookingModal.dispose();
+        document.getElementById('bookingModal').remove();
+    });
 }
+
 function bookVM(vmName) {
     const startDatetime = document.getElementById('startDatetime').value;
     const endDatetime = document.getElementById('endDatetime').value;
+
     if (!startDatetime || !endDatetime) {
         alert('Пожалуйста, выберите оба времени начала и окончания бронирования');
         return;
     }
-    const bookingData = {
-        vmName: vmName,
-        startDatetime: startDatetime,
-        endDatetime: endDatetime
-    };
-    const bookingModal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
-    bookingModal.hide();
-    console.log(JSON.stringify(bookingData))
-    fetch('/api/bookVM', {
+
+    const reserveUrl = `http://127.0.0.1:8000/desktops/reserve?name=${encodeURIComponent(vmName)}&reserve_from=${encodeURIComponent(startDatetime)}&reserve_until=${encodeURIComponent(endDatetime)}`;
+
+    fetch(reserveUrl, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookingData),
         credentials: "include"
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Бронирование успешно создано!');
-            } else {
-                alert('Ошибка при бронировании. Попробуйте снова.');
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || "Ошибка бронирования");
+                });
             }
+            return response.json();
+        })
+        .then(() => {
+            showNotification("Бронирование успешно создано!", "success");
+            fetchReservations(vmName);
         })
         .catch(error => {
-            console.error('Ошибка при отправке данных:', error);
-            alert('Ошибка при отправке данных. Попробуйте позже.');
+            console.error("Ошибка при бронировании:", error);
+            showNotification("Не удалось создать бронирование.", "error");
         });
 }
+
 function renderVMList(vms) {
     vmTableBody.innerHTML = "";
     vms.forEach((vm, index) => {

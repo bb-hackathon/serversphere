@@ -68,6 +68,44 @@
             color: #7f8c8d;
             margin-top: 40px;
         }
+
+        table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            background-color: #fff;
+            border-collapse: collapse;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: #343a40;
+            color: white;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -122,15 +160,15 @@
             <canvas id="processesChart"></canvas>
         </div>
         <div class="chart-container">
-            <div class="charts-title">Время работы процессов (секунды)</div>
-            <table id="uptimeTable" border="1" style="width: 100%; text-align: left;">
-                <thead>
+            <h2 class="mt-5">Время работы процессов (секунды)</h2>
+            <table class="table table-hover table-bordered mt-3">
+                <thead class="table-dark">
                     <tr>
                         <th>Процесс</th>
                         <th>Время работы (сек)</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="uptimeTable-body">
                 </tbody>
             </table>
         </div>
@@ -279,7 +317,6 @@
         
                 const currentTime = cpuData.labels.length + 1;
         
-                // Обновление данных графиков
                 cpuData.labels.push(currentTime);
                 cpuData.datasets[0].data.push(dataFromServer.cpu_usage);
         
@@ -308,7 +345,6 @@
                 memoryChart.update();
                 processesChart.update();
         
-                // Обновление таблицы
                 updateUptimeTable(dataFromServer.process_uptimes);
         
             } catch (error) {
@@ -319,7 +355,7 @@
         
         function updateUptimeTable(processUptimes) {
             const tableBody = document.querySelector("#uptimeTable tbody");
-            tableBody.innerHTML = ""; // Очистка старых данных
+            tableBody.innerHTML = ""; 
         
             Object.entries(processUptimes).forEach(([processName, uptime]) => {
                 const row = document.createElement("tr");
