@@ -87,7 +87,11 @@ class DesktopRepo:
             > datetime.datetime.fromisoformat(until).timestamp()
         ):
             raise InvalidReservation
-        print(reserved)
+        if (
+            datetime.datetime.fromisoformat(until).timestamp()
+            < datetime.datetime.fromisoformat(by).timestamp()
+        ):
+            raise InvalidReservation
         if reserved:
             raise AlreadyReserved(name)
 
@@ -153,3 +157,16 @@ class DesktopRepo:
     def start_reservation(self, id: int):
         self.__cursor.execute(START_RESERVATION, (id,))
         self.__cursor.connection.commit()
+
+    def reboot(self, name: str):
+        vm = self.get_desktop_by_name(name)
+        if not vm:
+            raise EntityNotFound
+        if not vm.isAlive:
+            raise VmIsDead(vm.name)
+        try:
+            request(
+                "POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/reboot"
+            ).status_code
+        except:
+            raise VmIsDead(vm.name)

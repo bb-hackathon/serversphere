@@ -74,3 +74,14 @@ def get_metrics(name: str, cur=Depends(get_cursor), _=Depends(get_user_id)):
         return JSONResponse(
             {"message": e.message}, status_code=status.HTTP_400_BAD_REQUEST
         )
+
+
+@desktop_router.post("/reboot")
+def reboot(name: str, cur=Depends(get_cursor), _=Depends(check_admin_rights)):
+    dsk_repo = DesktopRepo(cur)
+    try:
+        return dsk_repo.reboot(name)
+    except VmIsDead as e:
+        return JSONResponse(
+            {"message": e.message}, status_code=status.HTTP_400_BAD_REQUEST
+        )
