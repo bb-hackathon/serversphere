@@ -42,8 +42,13 @@ def get_reservations(
 ):
     dsk_repo = DesktopRepo(cur)
 
-    print(dsk_repo.get_reservations_on_desktop(name)) 
-    return list(map(lambda x: ReservationTimeUserDTO(**x), dsk_repo.get_reservations_on_desktop(name)))
+    print(dsk_repo.get_reservations_on_desktop(name))
+    return list(
+        map(
+            lambda x: ReservationTimeUserDTO(**x),
+            dsk_repo.get_reservations_on_desktop(name),
+        )
+    )
 
 
 @desktop_router.get("/fetch_desktops")
@@ -66,5 +71,6 @@ def get_metrics(name: str, cur=Depends(get_cursor), _=Depends(get_user_id)):
     try:
         return dsk_repo.get_metrics(name)
     except VmIsDead as e:
-        return JSONResponse({"message": e.message}, status_code=status.HTTP_400_BAD_REQUEST)
-
+        return JSONResponse(
+            {"message": e.message}, status_code=status.HTTP_400_BAD_REQUEST
+        )

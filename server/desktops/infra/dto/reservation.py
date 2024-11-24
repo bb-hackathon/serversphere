@@ -14,9 +14,9 @@ class ReservationTimeDTO(BaseEntity):
     reservedFrom: str
     reservedUntil: str
 
+
 class ReservationTimeUserDTO(ReservationTimeDTO):
     login: str
-    
 
 
 def check_reservation(reservation: ReservationDTO, timestamp):

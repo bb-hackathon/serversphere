@@ -25,17 +25,21 @@ def check_for_reservations():
             dsk_repo.delete_reservation(res.id)
             vm = dsk_repo.get_desktop_by_id(res.reservedDesktop)
             try:
-                req = request("POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/revoke_access", timeout=1.5)
-                if req.status_code>=400:
+                req = request(
+                    "POST",
+                    f"http://{vm.ip}:{vm.port}/serversphere/agent/revoke_access",
+                    timeout=1.5,
+                )
+                if req.status_code >= 400:
                     logging.critical(f"Failed to revoke access from {vm.ip}:{vm.port}")
                     continue
             except:
                 logging.critical(f"Failed to revoke access from {vm.ip}:{vm.port}")
 
-
         if (
             datetime.datetime.fromisoformat(res.reservedFrom).timestamp()
-            < datetime.datetime.now().timestamp() and not res.started 
+            < datetime.datetime.now().timestamp()
+            and not res.started
         ):
             vm = dsk_repo.get_desktop_by_id(res.reservedDesktop)
             user = usr_repo.get_user_by_id(res.reservedBy)
@@ -48,7 +52,12 @@ def check_for_reservations():
             if not user.sshKey:
                 continue
             try:
-                req = request("POST", f"http://{vm.ip}:{vm.port}/serversphere/agent/credentials/sshd", json={"pubkey": user.sshKey}, timeout=1)
+                req = request(
+                    "POST",
+                    f"http://{vm.ip}:{vm.port}/serversphere/agent/credentials/sshd",
+                    json={"pubkey": user.sshKey},
+                    timeout=1,
+                )
                 if req.status_code >= 400:
                     logging.warning(f"Failed to add ssh keys on {vm.ip}:{vm.port}")
                     continue
@@ -58,9 +67,6 @@ def check_for_reservations():
             res.started = True
 
     res = dsk_repo.get()
-
-
-
 
     for vm in res:
         try:
