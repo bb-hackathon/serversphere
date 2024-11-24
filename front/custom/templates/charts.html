@@ -267,13 +267,13 @@
                 const currentTime = cpuData.labels.length + 1;
 
                 cpuData.labels.push(currentTime);
-                cpuData.datasets[0].data.push(dataFromServer.cpu_load);
+                cpuData.datasets[0].data.push(dataFromServer.cpu_usage);
                 
                 memoryData.labels.push(currentTime);
                 memoryData.datasets[0].data.push(dataFromServer.ram_usage);
 
                 processesData.labels.push(currentTime);
-                processesData.datasets[0].data.push(dataFromServer.proccess_count);
+                processesData.datasets[0].data.push(dataFromServer.process_count);
 
                 if (cpuData.labels.length > 30) {
                     cpuData.labels.shift();
