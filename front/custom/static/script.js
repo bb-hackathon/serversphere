@@ -306,6 +306,7 @@ function renderVMList(vms) {
     vmTableBody.innerHTML = "";
     vms.forEach(vm => {
         const isConnected = vm.isAlive;
+        const isConnectedSession = connectionStatus[vm.name] || false;
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -318,11 +319,19 @@ function renderVMList(vms) {
                 </span>
             </td>
             <td>
+                <span class="badge ${isConnectedSession ? 'bg-success' : 'bg-secondary'}">
+                    ${isConnectedSession ? 'Онлайн' : 'Офлайн'}
+                </span>
+            </td>
+            <td>
                 <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, false)" class="btn btn-primary">Открыть в окне</button>
                 <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
+                ${isConnectedSession
+                    ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить текущую сессию</button>`
+                    : ''
+                }
                 ${isConnected
-                    ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить текущую сессию</button>
-                       <button onclick="rebootVM('${vm.name}')" class="btn btn-warning">Перезагрузить устройство</button>`
+                    ? `<button onclick="rebootVM('${vm.name}')" class="btn btn-warning">Перезагрузить устройство</button>`
                     : ''
                 }
                 <button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
