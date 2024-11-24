@@ -204,7 +204,10 @@ function fetchReservations(vmName) {
             return response.json();
         })
         .then(reservations => {
-            showBookingModal(vmName, reservations);
+            const userReservations = reservations.filter(reservation => reservation.login === currentUserLogin);
+            const commonReservations = reservations.filter(reservation => reservation.login !== currentUserLogin);
+
+            showBookingModal(vmName, userReservations, commonReservations);
         })
         .catch(error => {
             console.error("Ошибка загрузки бронирований:", error);
@@ -212,9 +215,16 @@ function fetchReservations(vmName) {
         });
 }
 
-function showBookingModal(vmName, reservations) {
-    const reservationList = reservations.map(reservation => `
+function showBookingModal(vmName, userReservations, commonReservations) {
+    const userReservationList = userReservations.map(reservation => `
         <li>
+            <strong>С:</strong> ${new Date(reservation.reservedFrom).toLocaleString()} 
+            <strong>До:</strong> ${new Date(reservation.reservedUntil).toLocaleString()}
+        </li>`).join("");
+
+    const commonReservationList = commonReservations.map(reservation => `
+        <li>
+            <strong>Пользователь:</strong> ${reservation.login}<br>
             <strong>С:</strong> ${new Date(reservation.reservedFrom).toLocaleString()} 
             <strong>До:</strong> ${new Date(reservation.reservedUntil).toLocaleString()}
         </li>`).join("");
@@ -228,8 +238,11 @@ function showBookingModal(vmName, reservations) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong>Бронирования:</strong></p>
-                        <ul>${reservationList || "<li>Нет текущих бронирований</li>"}</ul>
+                        <p><strong>Ваши бронирования:</strong></p>
+                        <ul>${userReservationList || "<li>У вас нет текущих бронирований</li>"}</ul>
+                        <hr>
+                        <p><strong>Общие бронирования:</strong></p>
+                        <ul>${commonReservationList || "<li>Нет общих бронирований</li>"}</ul>
                         <hr>
                         <label for="startDatetime">Дата и время начала</label>
                         <input type="datetime-local" id="startDatetime" class="form-control">
@@ -291,33 +304,41 @@ function bookVM(vmName) {
 
 function renderVMList(vms) {
     vmTableBody.innerHTML = "";
-    vms.forEach((vm, index) => {
-        const isConnected = connectionStatus[vm.name] || false;
+    vms.forEach(vm => {
+        const isConnected = vm.isAlive;
+
         const row = document.createElement("tr");
         row.innerHTML = `
-<td>${vm.name}</td>
-<td>${vm.ip}</td>
-<td>${vm.port}</td>
-<td>
-<span class="badge ${isConnected ? 'bg-success' : 'bg-secondary'}">
-${isConnected ? 'Онлайн' : 'Офлайн'}
-</span>
-</td>
-<td>
-<button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, false)" class="btn btn-primary">Открыть в окне</button>
-<button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
-${isConnected
-                ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить</button>`
+            <td>${vm.name}</td>
+            <td>${vm.ip}</td>
+            <td>${vm.port}</td>
+            <td>
+            <span class="badge ${isConnected ? 'bg-success' : 'bg-secondary'}">
+            ${isConnected ? 'Онлайн' : 'Офлайн'}
+            </span>
+            </td>
+            <td>
+            <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, false)" class="btn btn-primary">Открыть в окне</button>
+            <button onclick="connectVM('${vm.name}', '${vm.ip}', ${vm.port}, true)" class="btn btn-secondary">Открыть в новой вкладке</button>
+            ${isConnected
+                ? `<button onclick="disconnectVM('${vm.name}')" class="btn btn-warning">Отключить текущую сессию</button>`
                 : ''
             }
-<button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
-<button onclick="openBookVM('${vm.name}')" class="btn btn-success">Бронь</button>
-<button onclick="deleteVM('${vm.name}')" class="btn btn-danger">Удалить</button>
-</td>
-`;
+                <button onclick="openChartsPage('${vm.name}')" class="btn btn-info">Показать графики</button>
+                <button onclick="openBookVM('${vm.name}')" class="btn btn-success">Бронь</button>
+                <button onclick="rebootVM('${vm.name}')" class="btn btn-warning">Перезагрузить устройство</button>
+                <button onclick="deleteVM('${vm.name}')" class="btn btn-danger">Удалить</button>
+                </td>
+                `;
         vmTableBody.appendChild(row);
     });
 }
+
+function rebootVM(name) {
+
+}
+
+
 function addVM(ip, port, name, type = "Vm") {
     const url = "http://127.0.0.1:8000/admin/register_desktop";
     const requestData = {
