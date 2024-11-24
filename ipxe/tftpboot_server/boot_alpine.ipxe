@@ -1,0 +1,8 @@
+#!ipxe
+
+# specify the ip:port of HTTP server containing kernel src files
+set base-url http://192.168.122.217:8000
+
+kernel ${base-url}/alpine_boot/vmlinuz-virt console=tty0 modules=loop,squashfs quiet nomodeset alpine_repo=https://dl-cdn.alpinelinux.org/alpine/v3.16/main modloop=${base-url}/alpine_boot/modloop-virt
+initrd ${base-url}/alpine_boot/initramfs-virt
+boot
