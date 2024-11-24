@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request, Response
+from fastapi.responses import JSONResponse
 
 from desktops.exceptions import AlreadyReserved, InvalidReservation, VmIsDead
 from desktops.infra import desktop_repo
@@ -63,5 +64,5 @@ def get_metrics(name: str, cur=Depends(get_cursor), _=Depends(get_user_id)):
     try:
         return dsk_repo.get_metrics(name)
     except VmIsDead as e:
-        return Response(e.message, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse({"message": e.message}, status_code=status.HTTP_400_BAD_REQUEST)
 
