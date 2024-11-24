@@ -179,6 +179,8 @@
     </footer>
 
     <script>
+        let dataFetchInterval; 
+        dataFetchInterval = setInterval(fetchData, 3000);
         const cpuCtx = document.getElementById('cpuChart').getContext('2d');
         const memoryCtx = document.getElementById('memoryChart').getContext('2d');
         const processesCtx = document.getElementById('processesChart').getContext('2d');
