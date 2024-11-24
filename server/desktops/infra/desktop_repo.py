@@ -11,7 +11,7 @@ from common.exceptions import EntityNotFound
 from desktops.exceptions import AlreadyReserved, InvalidReservation, VmIsDead
 from desktops.infra.dto.desktops import DesktopCreateDTO, DesktopReadDTO, DesktopType
 from desktops.infra.dto.metrics import MetricsDTO
-from desktops.infra.dto.reservation import ReservationDTO, check_reservation
+from desktops.infra.dto.reservation import ReservationDTO, ReservationTimeUserDTO, check_reservation
 from desktops.infra.sql_queries import (
     CREATE_NEW_DESKTOP,
     DELETE_DESKTOP,
@@ -94,8 +94,9 @@ class DesktopRepo:
         self.__cursor.execute(GET_RESERVATIONS)
         return list(self.__cursor.fetchall())
 
-    def get_reservations_on_desktop(self) -> list[ReservationDTO]:
-        self.__cursor.execute(GET_RESERVATIONS_ON_DESKTOP)
+    def get_reservations_on_desktop(self, name) -> list[ReservationTimeUserDTO]:
+        vm = self.get_desktop_by_name(name)
+        self.__cursor.execute(GET_RESERVATIONS_ON_DESKTOP, (vm.id,))
         return list(self.__cursor.fetchall())
 
     def delete_reservation(self, id):

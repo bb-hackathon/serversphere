@@ -31,6 +31,11 @@ SELECT id, reservedFrom, reservedBy, reservedDesktop, reservedUntil, started FRO
 
 
 """
+GET_RESERVATIONS_ON_DESKTOP = """--sql
+SELECT id, reservedFrom, reservedBy, reservedDesktop, reservedUntil, started, (SELECT login FROM users WHERE users.id = reservedBy) as login FROM reservations WHERE reservedDesktop = ?
+
+
+"""
 
 DELETE_RESERVATION = """--sql
 DELETE FROM reservations WHERE id = ?

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from desktops.exceptions import AlreadyReserved, InvalidReservation, VmIsDead
 from desktops.infra import desktop_repo
 from desktops.infra.desktop_repo import DesktopRepo
-from desktops.infra.dto.reservation import ReservationTimeDTO
+from desktops.infra.dto.reservation import ReservationTimeDTO, ReservationTimeUserDTO
 from users.infra.dependency import get_cursor, get_user_id
 from starlette import status
 
@@ -41,11 +41,13 @@ def get_reservations(
     request: Request, name: str, _=Depends(get_user_id), cur=Depends(get_cursor)
 ):
     dsk_repo = DesktopRepo(cur)
-    return list(map(lambda x: ReservationTimeDTO(**x), dsk_repo.get_reservations()))
+
+    print(dsk_repo.get_reservations_on_desktop(name)) 
+    return list(map(lambda x: ReservationTimeUserDTO(**x), dsk_repo.get_reservations_on_desktop(name)))
 
 
 @desktop_router.get("/fetch_desktops")
-def get_reservations(request: Request, cur=Depends(get_cursor)):
+def fetch_desktops(request: Request, cur=Depends(get_cursor)):
     dsk_repo = DesktopRepo(cur)
     return dsk_repo.get_multipass_vm()
 
