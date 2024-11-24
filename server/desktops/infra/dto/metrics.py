@@ -5,3 +5,4 @@ class MetricsDTO(BaseModel):
     cpu_usage: float
     ram_usage: float
     process_count: int
+    process_uptimes: dict[str, float]
