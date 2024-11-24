@@ -89,7 +89,7 @@ class DesktopRepo:
             raise InvalidReservation
         if (
             datetime.datetime.fromisoformat(until).timestamp()
-            < datetime.datetime.fromisoformat(by).timestamp()
+            < datetime.datetime.fromisoformat(_from).timestamp()
         ):
             raise InvalidReservation
         if reserved:
