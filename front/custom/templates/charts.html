@@ -179,7 +179,7 @@
                     },
                     y: {
                         beginAtZero: true,
-                        max: 100,
+                        max: 1,
                         title: { display: true, text: 'Процент нагрузки' }
                     }
                 }
@@ -199,7 +199,7 @@
                     },
                     y: {
                         beginAtZero: true,
-                        max: 100,
+                        max: 1,
                         title: { display: true, text: 'Процент использования' }
                     }
                 }
@@ -254,9 +254,14 @@
 
         document.getElementById('')
 
-        async function fetchData(vmname) {
+        async function fetchData() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/desktops/metrics?name={{vm_name}}', {credentials: "include"});
+                const response = await fetch('http://127.0.0.1:8000/desktops/metrics?name={{vm_name}}', { credentials: "include" });
+
+                if (!response.ok) {
+                    throw new Error("Система недоступна");
+                }
+
                 const dataFromServer = await response.json();
 
                 const currentTime = cpuData.labels.length + 1;
@@ -281,20 +286,32 @@
                 }
 
                 if (processesData.labels.length > 30) {
-                    memoryData.labels.shift();
-                    memoryData.datasets[0].data.shift();
+                    processesData.labels.shift();
+                    processesData.datasets[0].data.shift();
                 }
 
                 cpuChart.update();
                 memoryChart.update();
                 processesChart.update();
             } catch (error) {
-                console.error('Ошибка при получении данных:', error);
+                console.error("Ошибка при получении данных:", error);
+                displaySystemUnavailable();
             }
         }
 
+        function displaySystemUnavailable() {
+            const container = document.querySelector(".container");
+            container.innerHTML = `
+                <div class="header">
+                    <h1>График состояния системы для test</h1>
+                    <p>Мониторинг загрузки процессора и использования памяти в реальном времени для выбранного хоста.</p>
+                    <p style="color: red; font-size: 1.2em; font-weight: bold;">Система недоступна</p>
+                </div>
+            `;
+            clearInterval(dataFetchInterval);
+        }
 
-        setInterval(fetchData, 1000);
+        setInterval(fetchData, 3000);
     </script>
 </body>
 </html>    
